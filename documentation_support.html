@@ -147,6 +147,36 @@
     .nav-buttons { display: flex; justify-content: flex-start; margin-top: 30px; margin-bottom: 20px; }
     .nav-btn { background: #f3f6f6; border: 1px solid #e1e4e5; padding: 10px 20px; color: #2980B9; text-decoration: none; border-radius: 3px; font-weight: bold; }
     .nav-btn:hover { background: #e1e4e5; }
+    /* Overflow guards (all widths) */
+    pre { overflow-x: auto; }
+    img { max-width: 100%; height: auto; }
+
+    /* Mobile: the sidebar stacks above the content and the page scrolls as one
+       document, instead of the sidebar taking 300px of a 375px screen */
+    @media (max-width: 768px) {
+      body { display: block; height: auto; overflow: visible; }
+      .rtd-sidebar { width: 100%; }
+      .rtd-sidebar-header { padding: 14px; }
+      .rtd-sidebar-header a { font-size: 1.2em; }
+      .rtd-sidebar-nav { padding: 10px 0; }
+      .rtd-sidebar-nav a { padding: 8px 20px 8px 24px; }
+      .rtd-main { overflow: visible; }
+      .rtd-main-header { padding: 10px 16px; flex-wrap: wrap; gap: 4px 14px; justify-content: flex-start; }
+      .rtd-content-wrapper { padding: 20px 16px; }
+      h1 { font-size: 1.75em; }
+      h2 { font-size: 1.35em; }
+      p, li { font-size: 1em; }
+      /* Fixed layout wraps the cells instead of pushing the table off-screen,
+         so nothing is hidden behind a horizontal scroll the reader has to find. */
+      table { table-layout: fixed; overflow-wrap: break-word; }
+      th, td { padding: 8px 6px; font-size: 0.92em; }
+      th:first-child, td:first-child { width: 30%; }
+      th:nth-child(2), td:nth-child(2) { width: 24%; }
+      .section-block { margin-bottom: 40px; }
+      .nav-buttons { flex-wrap: wrap; gap: 10px; }
+      .nav-btn { padding: 10px 14px; }
+    }
+
   </style>
 </head>
 <body>
@@ -230,8 +260,25 @@
           <p>Recent updates to the Urban360 documentation and project landing page.</p>
           
           <div style="border-left: 3px solid #2980B9; padding-left: 15px; margin-bottom: 25px;">
-            <h4 style="margin-bottom: 5px; color: #2980B9;">September 2, 2026</h4>
+            <h4 style="margin-bottom: 5px; color: #2980B9;">September 4, 2026</h4>
             <ul style="margin-top: 0; padding-left: 20px;">
+              <li><strong>Documentation:</strong> Fixed the mobile layout. The sidebar now stacks above the content and the page scrolls as a single document, and wide tables and code blocks no longer overflow the screen.</li>
+              <li><strong>Landing Page:</strong> Updated the geometric validation to cover the full release: 10,080 views across all three scenes, replacing the earlier 5,128 views across two.</li>
+              <li><strong>Landing Page:</strong> Published the site at hanaru.github.io/urban360.</li>
+            </ul>
+          </div>
+
+          <div style="border-left: 3px solid #999; padding-left: 15px; margin-bottom: 25px;">
+            <h4 style="margin-bottom: 5px; color: #666;">September 3, 2026</h4>
+            <ul style="margin-top: 0; padding-left: 20px; color: #555;">
+              <li><strong>Documentation:</strong> Confirmed the distribution format. The plugin ships as a compiled binary (<code>Urban360.zip</code>) with no build step, so Blueprint-only projects are supported and the source is not published.</li>
+              <li><strong>Documentation:</strong> Added three editor screenshots supplied by the authors, covering the Dataset Generator panel, the Plugins browser and the Project Settings page.</li>
+            </ul>
+          </div>
+
+          <div style="border-left: 3px solid #999; padding-left: 15px; margin-bottom: 25px;">
+            <h4 style="margin-bottom: 5px; color: #666;">September 2, 2026</h4>
+            <ul style="margin-top: 0; padding-left: 20px; color: #555;">
               <li><strong>Documentation:</strong> Updated configuration parameters and exact EXR output specifications based on actual plugin inspection.</li>
               <li><strong>Documentation:</strong> Corrected linear-light color information and clarified semantic feature status.</li>
               <li><strong>Landing Page:</strong> Added high-resolution qualitative comparisons (Fig 1, 2, 3) and stereo reprojection error validation.</li>
@@ -293,6 +340,11 @@
       const navLinks = document.querySelectorAll('.rtd-sidebar-nav a');
       const mainContent = document.getElementById('main-content');
 
+      // On mobile the page scrolls as one document, so the observer roots on the
+      // viewport instead of the main column and the sidebar is left where it is.
+      const onMobile = window.matchMedia('(max-width: 768px)').matches;
+      const scrollBox = onMobile ? document.scrollingElement : mainContent;
+
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if(entry.isIntersecting) {
@@ -300,25 +352,25 @@
               link.classList.remove('active');
               if(link.getAttribute('href').endsWith('#' + entry.target.id)) {
                 link.classList.add('active');
-                link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                if (!onMobile) link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
               }
             });
           }
         });
-      }, { root: mainContent, rootMargin: "-10% 0px -70% 0px", threshold: 0 });
+      }, { root: onMobile ? null : mainContent, rootMargin: "-10% 0px -70% 0px", threshold: 0 });
 
       sections.forEach(section => observer.observe(section));
 
       // Fallback: highlight the last section when scrolled to the absolute bottom
-      mainContent.addEventListener('scroll', () => {
-        if (mainContent.scrollHeight - mainContent.scrollTop <= mainContent.clientHeight + 5) {
+      (onMobile ? window : mainContent).addEventListener('scroll', () => {
+        if (scrollBox.scrollHeight - scrollBox.scrollTop <= scrollBox.clientHeight + 5) {
           const lastSection = sections[sections.length - 1];
           if (lastSection) {
             navLinks.forEach(link => {
               link.classList.remove('active');
               if(link.getAttribute('href').endsWith('#' + lastSection.id)) {
                 link.classList.add('active');
-                link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                if (!onMobile) link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
               }
             });
           }
