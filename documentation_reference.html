@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Urban360 Plugin - Reference</title>
+  
+  <style>
+    /* Reset & Base Typography */
+    * { box-sizing: border-box; }
+    body { 
+      margin: 0; 
+      font-family: "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif; 
+      display: flex; 
+      height: 100vh; 
+      background-color: #fcfcfc; 
+      color: #404040; 
+      overflow: hidden; 
+    }
+    
+    /* Layout */
+    .rtd-sidebar { 
+      width: 300px; 
+      background: #343131; 
+      color: #fcfcfc; 
+      display: flex; 
+      flex-direction: column; 
+      flex-shrink: 0; 
+      overflow-y: auto; 
+    }
+    .rtd-main { 
+      flex: 1; 
+      overflow-y: auto; 
+      display: flex; 
+      flex-direction: column; 
+      scroll-behavior: smooth;
+    }
+    
+    /* Sidebar Styling */
+    .rtd-sidebar-header { 
+      background: #2980B9; 
+      padding: 20px; 
+      text-align: center; 
+    }
+    .rtd-sidebar-header a { 
+      color: #fff; 
+      text-decoration: none; 
+      font-size: 1.5em; 
+      font-weight: bold; 
+    }
+    .rtd-sidebar-search { 
+      padding: 10px; 
+      background: #343131; 
+      border-bottom: 1px solid #4a4a4a;
+    }
+    .rtd-sidebar-search input { 
+      width: 100%; 
+      padding: 8px; 
+      border: none; 
+      border-radius: 2px; 
+      box-sizing: border-box; 
+      background: #fff;
+    }
+    .rtd-sidebar-nav { padding: 20px 0; }
+    .rtd-sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
+    .rtd-sidebar-nav li { margin: 0; }
+    .rtd-sidebar-nav .nav-header {
+      padding: 5px 20px;
+      font-size: 0.85em;
+      color: #999;
+      text-transform: uppercase;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .rtd-sidebar-nav a { 
+      display: block; 
+      padding: 10px 20px 10px 30px; 
+      color: #d9d9d9; 
+      text-decoration: none; 
+      border-left: 4px solid transparent; 
+      font-size: 0.95em;
+    }
+    .rtd-sidebar-nav a:hover { background: #4a4a4a; }
+    .rtd-sidebar-nav a.active { 
+      background: #4a4a4a; 
+      border-left-color: #2980B9; 
+      color: #fff; 
+      font-weight: bold;
+    }
+    
+    /* Main Header & Breadcrumbs */
+    .rtd-main-header { 
+      padding: 12px 30px; 
+      background: #fff; 
+      border-bottom: 1px solid #e1e4e5; 
+      font-size: 0.9em; 
+      color: #737373; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .rtd-main-header a { color: #2980B9; text-decoration: none; }
+    .rtd-main-header a:hover { text-decoration: underline; }
+    
+    /* Content Area */
+    .rtd-content-wrapper { flex: 1; padding: 30px; display: flex; justify-content: center; }
+    .rtd-content { max-width: 800px; width: 100%; }
+    
+    /* Typography */
+    h1, h2, h3 { color: #2980B9; margin-top: 1.5em; margin-bottom: 0.5em; font-family: "Roboto Slab", "ff-tisa-web-pro", "Georgia", Arial, sans-serif; }
+    h1 { border-bottom: 1px solid #e1e4e5; padding-bottom: 10px; margin-top: 0; font-size: 2.2em; }
+    h2 { border-bottom: 1px solid #e1e4e5; padding-bottom: 5px; font-size: 1.7em; }
+    a { color: #2980B9; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    p, li { line-height: 1.6; font-size: 1.05em; color: #404040;}
+    code { 
+      background: #e8e8e8; 
+      padding: 2px 5px; 
+      color: #E74C3C; 
+      font-family: Consolas, monospace; 
+      font-size: 0.9em; 
+      border-radius: 3px;
+    }
+    
+    /* Admonitions */
+    .admonition { padding: 15px; margin: 20px 0; border-radius: 2px; }
+    .admonition-title { font-weight: bold; margin-bottom: 10px; margin-top: 0; font-size: 1.1em;}
+    .admonition.note { background: #e7f2fa; border-left: 4px solid #6ab0de; }
+    .admonition.note .admonition-title { color: #2980B9; }
+    .admonition.warning { background: #ffedcc; border-left: 4px solid #f0b37e; }
+    .admonition.warning .admonition-title { color: #d05b04; }
+    
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { border: 1px solid #e1e4e5; padding: 12px; text-align: left; }
+    th { background: #f3f6f6; font-weight: bold; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    
+    /* Sections */
+    .section-block { padding-top: 40px; margin-top: -40px; margin-bottom: 60px; }
+    
+    /* Footer & Navigation Buttons */
+    .rtd-footer { margin-top: 40px; border-top: 1px solid #e1e4e5; padding-top: 20px; font-size: 0.9em; color: #999; }
+    .nav-buttons { display: flex; justify-content: flex-start; margin-top: 30px; margin-bottom: 20px; }
+    .nav-btn { background: #f3f6f6; border: 1px solid #e1e4e5; padding: 10px 20px; color: #2980B9; text-decoration: none; border-radius: 3px; font-weight: bold; }
+    .nav-btn:hover { background: #e1e4e5; }
+  </style>
+</head>
+<body>
+
+  <!-- Left Sidebar (RTD Style) -->
+  <nav class="rtd-sidebar">
+    <div class="rtd-sidebar-header">
+      <a href="index.html">Urban360 Plugin</a>
+      <div style="font-size: 0.7em; margin-top: 5px; color: #a5d3f1;">latest</div>
+    </div>
+
+    <div class="rtd-sidebar-nav">
+      <ul>
+        <li class="nav-header">Getting Started</li>
+        <li><a href="documentation.html#introduction">Introduction & Requirements</a></li>
+        <li><a href="documentation.html#installation">Installation</a></li>
+        <li><a href="documentation.html#quick-start">Quick Start</a></li>
+        <li class="nav-header">Reference</li>
+        <li><a href="documentation_reference.html#configuration">Configuration Parameters</a></li>
+        <li><a href="documentation_reference.html#output-format">Output Format</a></li>
+        <li class="nav-header">Support</li>
+        <li><a href="documentation_support.html#troubleshooting">Troubleshooting & FAQs</a></li>
+        <li><a href="documentation_support.html#release-updates">Release & Updates</a></li>
+        <li><a href="documentation_support.html#contact">Contact & Request Access</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content (RTD Style) -->
+  <main class="rtd-main" id="main-content">
+    
+    <!-- Top Breadcrumb -->
+    <header class="rtd-main-header">
+      <div>
+        <a href="index.html">Docs</a> &raquo; Reference
+      </div>
+      <div>
+        <a href="index.html">&larr; Return to Project Page</a>
+      </div>
+    </header>
+
+    <!-- Scrollable Content Area -->
+    <div class="rtd-content-wrapper">
+      <div class="rtd-content">
+        
+        <h1>Reference</h1>
+        <p>This section provides detailed reference materials for configuring the Urban360 plugin, understanding its output structures, and resolving common issues.</p>
+
+        <!-- 4. Configuration -->
+        <div class="section-block" id="configuration">
+          <h2>Configuration Parameters</h2>
+          <p>These parameters are configured in <strong>Project Settings &gt; Plugins &gt; Urban360</strong>, not in the actor's Details panel:</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Parameter (Project Settings &gt; Plugins &gt; Urban360)</th>
+                <th>Default</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Resolution</strong> (internal: <code>AtlasWidth</code>)</td>
+                <td><code>1024</code></td>
+                <td>Pixel width of each eye's 360&deg; image; the height is always half of it. Stereo stacks both eyes into one file, so 1024 writes a 1024&times;1024 file holding two 1024&times;512 views. Range 512&ndash;4096. The released Urban360 Dataset was captured at this setting; the experiments in the paper were run at 1920.</td>
+              </tr>
+              <tr>
+                <td><strong>Capture Type</strong></td>
+                <td><code>Stereo</code></td>
+                <td>Stereo (both eyes) or Mono.</td>
+              </tr>
+              <tr>
+                <td><strong>Capture Count</strong></td>
+                <td><code>Single</code></td>
+                <td>A single centre node, or a 9-node isotropic cluster (Group).</td>
+              </tr>
+              <tr>
+                <td><strong>Capture Height</strong></td>
+                <td><code>160 cm</code></td>
+                <td>Camera height above the actual ground surface (re-measured per point via a downward raycast).</td>
+              </tr>
+              <tr>
+                <td><strong>Capture Color / Depth / Normal / Semantic</strong></td>
+                <td>Color, Depth, Normal on; Semantic off</td>
+                <td>Per-modality capture toggles.</td>
+              </tr>
+              <tr>
+                <td><strong>Adaptive Exposure</strong></td>
+                <td><code>On</code></td>
+                <td>Meters the scene once per panorama and freezes that EV across all 168 slices. Off uses a fixed bias of 2.0.</td>
+              </tr>
+              <tr>
+                <td><strong>Exposure Target Grey</strong></td>
+                <td><code>0.06</code></td>
+                <td>Master brightness target for colour (EV = log<sub>2</sub>(metered / target)).</td>
+              </tr>
+              <tr>
+                <td><strong>Exposure Min / Max EV</strong></td>
+                <td><code>&minus;6.0 / 2.0</code></td>
+                <td>Exposure clamps.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="admonition note">
+            <p class="admonition-title">Stereo baseline</p>
+            <p>Note: the stereo baseline is fixed at 6.4 cm total (&plusmn;3.2 cm per eye) through the <code>DG.EyeSeparation</code> console variable; it is not a Details-panel field.</p>
+          </div>
+          <div class="admonition note">
+            <p class="admonition-title">Semantic segmentation</p>
+            <p>Semantic segmentation is implemented in the plugin but is not part of the v1 release. It will be enabled in a future update, together with a semantic sample and its class taxonomy.</p>
+          </div>
+        </div>
+
+        <!-- 5. Output Format -->
+        <div class="section-block" id="output-format">
+          <h2>Output Format</h2>
+          <p>The plugin writes three separate FP16 EXR files per view, not one multi-channel file. Each file is W &times; W, HALF float, ZIP-compressed, RGBA. The two stereo eyes are stacked in each file (left on top, right on bottom), so each eye is a W &times; W/2 equirectangular image.</p>
+          <ul>
+            <li><strong>Color</strong> (<code>{scene}_pos5_color.exr</code>): ACES-tonemapped LDR in linear light (no sRGB gamma), range [0, 1], alpha = 1. Apply an sRGB transfer before display or before feeding sRGB-trained backbones.</li>
+            <li><strong>Depth</strong> (<code>{scene}_pos5_depth.exr</code>): R = G = B = radial distance (metres) to the first surface the ray meets. Sky = 65504.0, invalid = 0.0 (use <code>valid = depth &lt; 65504.0</code>). Alpha = translucency mask (1 = opaque, 0 = a translucent surface came first).</li>
+            <li><strong>Normal</strong> (<code>{scene}_pos5_normal.exr</code>): RGB = unit surface normal in CV coordinates, derived from the depth. Alpha = validity mask (1 = valid, 0 = invalid).</li>
+            <li><strong>Coordinate frame:</strong> CV standard (X-right, Y-down, Z-forward), metres.</li>
+            <li><strong>Camera Pose:</strong> <code>{scene}_manifest.csv</code>, one row per node, columns: <code>Filename, PosX, PosY, PosZ, Qw, Qx, Qy, Qz, ExposureEV, DepthConvention, TranslucentElements, TranslucentPct, StitchParams, RenderParams</code>. Position in metres, unit quaternion in WXYZ order, CV frame. Pose is not stored in the EXR and not in a <code>metadata.json</code>.</li>
+          </ul>
+          <pre><code>&lt;Environment&gt;/&lt;SceneID&gt;/
+    &lt;SceneID&gt;_pos5_color.exr   &lt;SceneID&gt;_pos5_depth.exr   &lt;SceneID&gt;_pos5_normal.exr
+    &lt;SceneID&gt;_manifest.csv</code></pre>
+          <div class="admonition note">
+            <p class="admonition-title">Bundled reference documents</p>
+            <p>The plugin ships two authoritative reference documents: <code>Urban360_Dataset_Architecture.md</code> (the output contract) and <code>Urban360_Dataset_ERRATA.md</code> (paper-versus-release differences). Both ship with the plugin and will be distributed alongside the dataset.</p>
+          </div>
+        </div>
+
+        <div class="nav-buttons" style="display: flex; justify-content: space-between; width: 100%;">
+          <a href="documentation.html" class="nav-btn">&larr; Previous: Getting Started</a>
+          <a href="documentation_support.html" class="nav-btn">Next: Support &rarr;</a>
+        </div>
+
+        <div class="rtd-footer">
+          <p>&copy; Copyright 2026, Urban360 Contributors. Built with custom HTML/CSS mirroring the Sphinx Read the Docs theme.</p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Intersection Observer for Sidebar Highlighting -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const sections = document.querySelectorAll('.section-block');
+      const navLinks = document.querySelectorAll('.rtd-sidebar-nav a');
+      const mainContent = document.getElementById('main-content');
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting) {
+            navLinks.forEach(link => {
+              link.classList.remove('active');
+              if(link.getAttribute('href').endsWith('#' + entry.target.id)) {
+                link.classList.add('active');
+                link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }
+            });
+          }
+        });
+      }, { root: mainContent, rootMargin: "-10% 0px -70% 0px", threshold: 0 });
+
+      sections.forEach(section => observer.observe(section));
+
+      // Fallback: highlight the last section when scrolled to the absolute bottom
+      mainContent.addEventListener('scroll', () => {
+        if (mainContent.scrollHeight - mainContent.scrollTop <= mainContent.clientHeight + 5) {
+          const lastSection = sections[sections.length - 1];
+          if (lastSection) {
+            navLinks.forEach(link => {
+              link.classList.remove('active');
+              if(link.getAttribute('href').endsWith('#' + lastSection.id)) {
+                link.classList.add('active');
+                link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }
+            });
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
