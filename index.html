@@ -36,6 +36,28 @@
       box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: background-color 0.3s;
     }
     #backToTopBtn:hover { background-color: #555; }
+    /* Inset figures: narrowed on desktop, full width on a phone where 80% of a
+       375px screen leaves the axis labels unreadable. */
+    .figure-inset { margin: 0 auto; }
+    .figure-inset-90 { max-width: 90%; }
+    .figure-inset-80 { max-width: 80%; }
+
+    /* Mobile: the comparison tables are wider than a phone screen and scroll
+       sideways inside their container, which is easy to miss without a note. */
+    @media (max-width: 768px) {
+      table { font-size: 0.85em; }
+      th, td { padding: 0.4em; }
+      .table-container::after {
+        content: "Scroll the table sideways to see every column.";
+        display: block;
+        margin-top: 6px;
+        font-size: 0.8rem;
+        color: #7a7a7a;
+      }
+      .figure-inset-90, .figure-inset-80 { max-width: 100%; }
+      #backToTopBtn { bottom: 16px; right: 16px; padding: 10px 14px; }
+    }
+
   </style>
 </head>
 <body>
@@ -220,7 +242,7 @@
             </p>
             
             <div class="has-text-centered mt-5">
-               <div style="max-width: 90%; margin: 0 auto;">
+               <div class="figure-inset figure-inset-90">
                  <img src="assets/stitching_ssr_lumen.png" alt="Two equirectangular crops of a lakeside scene, one rendered with screen-space reflection and one with Lumen front-layer tracing, above a Fourier spectrum of the water surface in which the peak at the slice frequency is lower for Lumen" style="width:100%;">
                  <p class="is-size-6 has-text-grey mt-2">Screen-space reflection (top) versus Lumen front-layer tracing (middle) on a water surface. The two crops look identical, but in the Fourier spectrum of the water the peak at the slice frequency (period = <em>W</em>/24) falls to 0.64&times; of the screen-space level: a traced reflection no longer depends on which slice the pixel came from.</p>
                </div>
@@ -447,12 +469,12 @@
         <h2 class="title is-3 has-text-centered">Supplementary: Geometric Validation</h2>
         <div class="content">
           <p>
-            To directly validate the "FP16 geometric GT" claim independently of downstream models, we perform stereo reprojection sweeping a global depth scale <em>s</em>. If the exported depth correctly represents absolute metric distance, reprojection error must be minimized exactly at <em>s</em> = 1.0. Across 5,128 views (CityPark + DownTownWest), the optimal scale strictly aligns at <strong>1.00</strong> (median argmin 1.01).
+            To directly validate the "FP16 geometric GT" claim independently of downstream models, we perform stereo reprojection sweeping a global depth scale <em>s</em>. If the exported depth correctly represents absolute metric distance, reprojection error must be minimized exactly at <em>s</em> = 1.0. Across all <strong>10,080 views</strong> of the release, the optimal scale aligns at <strong>1.00</strong> (median argmin 1.010, with 97.9% of views inside &plusmn;10%), and each of the three scenes reaches that minimum on its own rather than only in aggregate. A separate contract gate over the same 10,080 nodes reports zero violations.
           </p>
           <div class="has-text-centered mt-4">
-            <div style="max-width: 80%; margin: 0 auto;">
-              <img src="assets/stereo_validation.png" alt="Stereo reprojection error as a function of a global depth scale, minimized at a scale of 1.0" style="width:100%;">
-              <p class="is-size-6 has-text-grey mt-2">Global depth scale validation (Note: evaluation performed on 2 of the 3 scenes).</p>
+            <div class="figure-inset figure-inset-80">
+              <img src="assets/stereo_validation.png" alt="Stereo reprojection error as a function of a global depth scale, minimized at a scale of 1.0 for each of the three scenes and for all views combined" style="width:100%;">
+              <p class="is-size-6 has-text-grey mt-2">Global depth scale validation over the full release: 10,080 views across all three scenes.</p>
             </div>
           </div>
         </div>
