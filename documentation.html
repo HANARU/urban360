@@ -73,14 +73,18 @@
         <div class="section-block" id="installation">
           <h2>Installation</h2>
           <p>Urban360 is distributed as a compiled plugin, so there is no build step and it drops into an existing project as it is.</p>
+          <div class="admonition warning">
+            <p class="admonition-title">Not yet publicly released</p>
+            <p>The plugin binary will be published together with the paper, so <code>Urban360.zip</code> is not available for download yet. To try it before then, request early access through the <a href="documentation_support.html#contact">contact form</a>. The steps below describe the installation once you have the archive.</p>
+          </div>
           <ol>
-            <li>Download <code>Urban360.zip</code> from the repository.</li>
+            <li>Obtain <code>Urban360.zip</code> (from the public release, or from the authors if you were granted early access).</li>
             <li>Create a <code>Plugins</code> folder at the root of your project. Unreal does not create this folder for you, so it will normally not be there yet.</li>
             <li>Extract the archive so that the plugin folder (<code>Sim2RealDataGen</code>) sits directly under <code>&lt;YourProject&gt;/Plugins/</code>.</li>
             <li>Open the project, go to <strong>Edit &gt; Plugins</strong>, search for <em>Urban360</em>, enable it, and restart the editor when prompted. The plugin is then ready to use.</li>
           </ol>
           <div style="text-align: center; margin: 24px 0;">
-            <img src="assets/plugin_enabled.jpg" alt="The Unreal Editor Plugins browser with Urban360 listed under Project, Other, at version 1.0 with its checkbox ticked, and the Dataset Generator panel open on the right" style="max-width: 100%; border: 1px solid #e1e4e5; border-radius: 3px;">
+            <img loading="lazy" src="assets/plugin_enabled.jpg" alt="The Unreal Editor Plugins browser with Urban360 listed under Project, Other, at version 1.0 with its checkbox ticked, and the Dataset Generator panel open on the right" style="max-width: 100%; border: 1px solid #e1e4e5; border-radius: 3px;">
             <p style="font-size: 0.9em; color: #737373; margin-top: 8px;">Once enabled, Urban360 appears under <em>Project &gt; Other</em> in the Plugins browser and the Dataset Generator panel becomes available.</p>
           </div>
           <div class="admonition note">
@@ -99,7 +103,7 @@
             <li>Run the capture. The plugin renders 168 slices per view, stitches them through the GeoLUT, and writes the EXR files and the manifest to the output directory.</li>
           </ol>
           <div style="text-align: center; margin: 24px 0;">
-            <img src="assets/plugin_quickstart.png" alt="The Urban360 page in Unreal's Project Settings, listing the Climate, Config, Generation, Capture and Exposure sections with capture type, per-modality toggles, capture count, capture height, grid distance and output resolution" style="max-width: 100%; border: 1px solid #e1e4e5; border-radius: 3px;">
+            <img loading="lazy" src="assets/plugin_quickstart.png" alt="The Urban360 page in Unreal's Project Settings, listing the Climate, Config, Generation, Capture and Exposure sections with capture type, per-modality toggles, capture count, capture height, grid distance and output resolution" style="max-width: 100%; border: 1px solid #e1e4e5; border-radius: 3px;">
             <p style="font-size: 0.9em; color: #737373; margin-top: 8px;">Capture options live in <em>Project Settings &gt; Plugins &gt; Urban360</em>: the capture type, which modalities to write, the capture count, the camera height, the grid distance and the output resolution. The values above are an example, not the defaults.</p>
           </div>
         </div>
