@@ -7,6 +7,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Urban360</title>
 
+  <!-- Open Graph / Facebook / Kakao / Slack -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://hanaru.github.io/urban360/">
+  <meta property="og:title" content="Urban360">
+  <meta property="og:description" content="A Panoramic Synthetic Data Generation Pipeline with FP16 Geometric Ground Truth">
+  <meta property="og:image" content="https://hanaru.github.io/urban360/assets/Thumbnail.jpg">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://hanaru.github.io/urban360/">
+  <meta name="twitter:title" content="Urban360">
+  <meta name="twitter:description" content="A Panoramic Synthetic Data Generation Pipeline with FP16 Geometric Ground Truth">
+  <meta name="twitter:image" content="https://hanaru.github.io/urban360/assets/Thumbnail.jpg">
+
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -121,17 +135,17 @@
           </div>
 
           <div class="publication-links">
-            <span class="link-block">
-              <a href="#" class="external-link button is-normal is-rounded is-dark" title="To be released upon publication">
+            <span class="link-block" title="To be released upon publication">
+              <button type="button" class="button is-normal is-rounded is-dark" disabled>
                 <span class="icon"><i class="fas fa-file-pdf"></i></span>
                 <span>Paper (Pending)</span>
-              </a>
+              </button>
             </span>
-            <span class="link-block">
-              <a href="#" class="external-link button is-normal is-rounded is-dark" title="To be released upon publication">
+            <span class="link-block" title="To be released upon publication">
+              <button type="button" class="button is-normal is-rounded is-dark" disabled>
                 <span class="icon"><i class="fab fa-github"></i></span>
                 <span>Plugin Binary (Pending)</span>
-              </a>
+              </button>
             </span>
             <span class="link-block">
               <a href="documentation.html" class="external-link button is-normal is-rounded is-dark">
@@ -139,11 +153,11 @@
                 <span>Documentation</span>
               </a>
             </span>
-            <span class="link-block">
-              <a href="#" class="external-link button is-normal is-rounded is-dark" title="To be released upon publication">
+            <span class="link-block" title="To be released upon publication">
+              <button type="button" class="button is-normal is-rounded is-dark" disabled>
                 <span class="icon"><i class="far fa-images"></i></span>
                 <span>Dataset (Pending)</span>
-              </a>
+              </button>
             </span>
           </div>
           
@@ -177,7 +191,7 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            Simulation-based data generation is essential for training and evaluating equirectangular panoramic (ERP) depth estimation models, where dense real-world ground truth (GT) is difficult to obtain. However, existing resources are either fixed pre-generated panoramic datasets or flexible generators designed mainly for perspective cameras, and therefore do not simultaneously provide panoramic output, scene-level flexibility, and geometrically consistent multimodal ground truth. We propose <b>Urban360</b>, a plug-and-play Unreal Engine 5 (UE5) plugin pipeline that generates panoramic synthetic data (RGB, Depth, Normal, and Camera Pose) for arbitrary UE5 scenes under a specified coordinate convention with pixel-wise consistency, together with the resulting <b>Urban360 Dataset</b> (3 scenes, 10,080 views). The pipeline renders RGB with Lumen global illumination (hardware ray tracing) and captures Depth from the geometry buffer for dense GT that sparse real-world LiDAR cannot provide, and stitches a low-distortion ERP via a 168-slice Geometric Look-Up Table (GeoLUT); Surface Normal is derived from GT Depth at the capture resolution, keeping all image modalities pixel-wise consistent in a unified FP16 EXR format. To validate the pipeline output, we use real-world outdoor panoramic depth estimation as a downstream task: fine-tuning three representative models (DA360, DAP, DA²) on Urban360 yields consistent improvements on the Helvipad outdoor benchmark, and under a matched protocol it achieves better overall transfer performance than the competing synthetic dataset PanoCity. The Urban360 plugin and dataset will be publicly released upon publication.
+            Simulation-based data generation is essential for training and evaluating equirectangular panoramic (ERP) depth estimation models, where dense real-world ground truth (GT) is difficult to obtain. However, existing resources are either fixed pre-generated panoramic datasets or flexible generators designed mainly for perspective cameras, and therefore do not simultaneously provide panoramic output, scene-level flexibility, and geometrically consistent multimodal ground truth. We propose <b>Urban360</b>, a plug-and-play Unreal Engine 5 (UE5) plugin pipeline that generates panoramic synthetic data (RGB, Depth, Normal, and Camera Pose) for arbitrary UE5 scenes under a specified coordinate convention with pixel-wise consistency, together with the resulting <b>Urban360 Dataset</b> (3 scenes, 10,080 views). The pipeline renders RGB with Lumen global illumination (hardware ray tracing) and captures Depth from the geometry buffer for dense GT that sparse real-world LiDAR cannot provide, and stitches a low-distortion ERP via a 168-slice Geometric Look-Up Table (GeoLUT); Surface Normal is derived from GT Depth at the capture resolution, keeping all image modalities pixel-wise consistent in a unified FP16 EXR format. To validate the pipeline output, we use real-world outdoor panoramic depth estimation as a downstream task: fine-tuning three representative models (DA360, DAP, DA&sup2;) on Urban360 yields consistent improvements on the Helvipad outdoor benchmark, and under a matched protocol it achieves better overall transfer performance than the competing synthetic dataset PanoCity. The Urban360 plugin and dataset will be publicly released upon publication.
           </p>
         </div>
       </div>
@@ -203,7 +217,7 @@
             <li><strong>Binary Release:</strong> The plugin ships compiled for Unreal Engine 5.7 and installs into any project, Blueprint-only ones included, with no build step. Its source code is not published.</li>
           </ul>
           <div class="has-text-centered mt-5">
-            <img src="assets/plugin_ui.jpg" alt="The Urban360 Dataset Generator panel docked in the Unreal Editor, with capture points placed along a path in the viewport and the Capture tab showing the stereo mode, per-modality toggles, capture count, camera height and local step" style="width:100%; border: 1px solid #dbdbdb; border-radius: 4px;">
+            <img loading="lazy" src="assets/plugin_ui.jpg" alt="The Urban360 Dataset Generator panel docked in the Unreal Editor, with capture points placed along a path in the viewport and the Capture tab showing the stereo mode, per-modality toggles, capture count, camera height and local step" style="width:100%; border: 1px solid #dbdbdb; border-radius: 4px;">
             <p class="is-size-6 has-text-grey mt-2">The Dataset Generator panel inside the Unreal Editor. Capture points sit along a path in the level, and the Capture tab selects the stereo mode, the modalities to write, the capture count, the camera height and the local step.</p>
           </div>
         </div>
@@ -228,7 +242,7 @@
           <ul>
             <li><strong>(i)</strong> A plug-and-play UE5 plugin pipeline that generates panoramic (ERP) synthetic data for arbitrary UE5 scenes; to our knowledge the first to jointly export RGB, Depth, Normal, and Camera Pose under a specified coordinate convention with pixel-wise consistency, using Lumen global illumination (hardware ray tracing) and 168-slice GeoLUT ERP stitching.</li>
             <li><strong>(ii)</strong> The Urban360 Dataset (3 scenes, 10,080 views) in a unified FP16 EXR format, with Surface Normal derived from GT Depth at the capture resolution (Eq. 1) for pixel-wise consistency.</li>
-            <li><strong>(iii)</strong> Using real-world outdoor panoramic depth estimation as a downstream task, fine-tuning three representative models (DA360, DAP, DA²) on Urban360 gives consistent improvements on Helvipad outdoor (AbsRel &minus;9 to &minus;33%, &delta;<sub>1</sub> +12 to +109%) and better overall transfer than the competing synthetic dataset PanoCity under a matched protocol.</li>
+            <li><strong>(iii)</strong> Using real-world outdoor panoramic depth estimation as a downstream task, fine-tuning three representative models (DA360, DAP, DA&sup2;) on Urban360 gives consistent improvements on Helvipad outdoor (AbsRel &minus;9 to &minus;33%, &delta;<sub>1</sub> +12 to +109%) and better overall transfer than the competing synthetic dataset PanoCity under a matched protocol.</li>
           </ul>
         </div>
       </div>
@@ -244,7 +258,7 @@
         <h2 class="title is-3 has-text-centered">Method: Capture Pipeline</h2>
         
         <div class="has-text-centered" style="margin-bottom: 20px;">
-          <div class="figure-scroll"><img src="assets/fig1_pipeline.png" alt="The Urban360 capture pipeline: anchor sampling, 168 narrow-FOV slices, GeoLUT equirectangular stitching, and FP16 EXR output"></div>
+          <div class="figure-scroll"><img loading="lazy" src="assets/fig1_pipeline.png" alt="The Urban360 capture pipeline: anchor sampling, 168 narrow-FOV slices, GeoLUT equirectangular stitching, and FP16 EXR output"></div>
           <p class="is-size-6 has-text-grey mt-2">The Urban360 capture pipeline: (a) anchor sampling along a road-spline path in a UE5 scene, (b) 168 narrow-FOV slices (24&times;7, 30&deg;&times;30&deg;) captured via SceneCapture with Lumen ray tracing, (c) GeoLUT equirectangular stitching, and (d) FP16 EXR output (RGB, Depth, Normal) with camera pose.</p>
         </div>
 
@@ -258,10 +272,10 @@
           <div class="mt-5">
             <p>
               <strong>Output Modalities:</strong> RGB (LDR, ACES tonemapping, linear light), Depth (radial ray distance, meters), Camera Pose (world coords + quaternion).<br>
-              <strong>Surface Normal:</strong> Derived from the same panoramic Depth (<code>SCS_SceneDepth, R32F</code>) via numerical differentiation. For ERP pixel (u,v), the surface coordinate is P(u,v) = D(u,v)&middot;r̂(u,v), and Normal is the cross product of the two parametric tangents:
+              <strong>Surface Normal:</strong> Derived from the same panoramic Depth (<code>SCS_SceneDepth, R32F</code>) via numerical differentiation. For ERP pixel (u,v), the surface coordinate is P(u,v) = D(u,v)&middot;r&#770;(u,v), and Normal is the cross product of the two parametric tangents:
             </p>
             <div class="has-text-centered" style="margin: 15px 0;">
-              <img src="assets/eq_normal.svg" alt="Surface normal equation: N-hat of (u, v) equals normalize of the cross product of partial P over partial v and partial P over partial u." style="max-width:100%; height:auto;" />
+              <img loading="lazy" src="assets/eq_normal.svg" alt="Surface normal equation: N-hat of (u, v) equals normalize of the cross product of partial P over partial v and partial P over partial u." style="max-width:100%; height:auto;" />
             </div>
             <p>
               Because Depth and Normal are derived from the <strong>same source</strong>, Depth-Normal inconsistencies from independent stitching do not arise in principle. Stored in <strong>FP16 EXR</strong> files.
@@ -269,7 +283,7 @@
             
             <div class="has-text-centered mt-5">
                <div class="figure-inset figure-inset-90">
-                 <img src="assets/stitching_ssr_lumen.png" alt="Two equirectangular crops of a lakeside scene, one rendered with screen-space reflection and one with Lumen front-layer tracing, above a Fourier spectrum of the water surface in which the peak at the slice frequency is lower for Lumen" style="width:100%;">
+                 <img loading="lazy" src="assets/stitching_ssr_lumen.png" alt="Two equirectangular crops of a lakeside scene, one rendered with screen-space reflection and one with Lumen front-layer tracing, above a Fourier spectrum of the water surface in which the peak at the slice frequency is lower for Lumen" style="width:100%;">
                  <p class="is-size-6 has-text-grey mt-2">Screen-space reflection (top) versus Lumen front-layer tracing (middle) on a water surface. The two crops look identical, but in the Fourier spectrum of the water the peak at the slice frequency (period = <em>W</em>/24) falls to 0.64&times; of the screen-space level: a traced reflection no longer depends on which slice the pixel came from.</p>
                </div>
             </div>
@@ -304,8 +318,8 @@
               <thead>
                 <tr>
                   <th class="has-text-left-custom">Feature</th>
-                  <th><a href="https://scholar.google.com/scholar?q=CARLA:+an+open+urban+driving+simulator" target="_blank" class="reference-link">CARLA</a></th>
-                  <th><a href="https://scholar.google.com/scholar?q=PanoVGGT" target="_blank" class="reference-link">PanoCity</a></th>
+                  <th><a href="https://arxiv.org/abs/1711.03938" target="_blank" class="reference-link">CARLA</a></th>
+                  <th><a href="https://arxiv.org/abs/2603.17571" target="_blank" class="reference-link" title="PanoCity dataset, introduced in the PanoVGGT paper">PanoCity</a></th>
                   <th><a href="https://arxiv.org/abs/2212.05040" target="_blank" class="reference-link">OmniHorizon</a></th>
                   <th><a href="https://arxiv.org/abs/2605.26368" target="_blank" class="reference-link">PanoInfinigen</a></th>
                   <th class="is-bold" style="background-color: #f5f5f5;">Urban360 (Ours)</th>
@@ -375,8 +389,8 @@
         
         <div class="content">
           <p>
-            Fine-tuning three representative foundation models (<a href="https://arxiv.org/abs/2512.22819" target="_blank" class="reference-link">DA360</a>, <a href="https://scholar.google.com/scholar?q=Depth+any+panoramas:+a+foundation+model+for+panoramic+depth+estimation" target="_blank" class="reference-link">DAP</a>, <a href="https://scholar.google.com/scholar?q=DA2:+depth+anything+in+any+direction" target="_blank" class="reference-link">DA&sup2;</a>) on Urban360 yields consistent improvements. 
-            The magnitude of improvement is inversely related to base model strength. Against a comparable synthetic dataset (<a href="https://scholar.google.com/scholar?q=PanoVGGT" target="_blank" class="reference-link">PanoCity</a>), Urban360 shows better overall transfer performance, highlighting the value of plug-and-play domain matching versus fixed near-range biased datasets.
+            Fine-tuning three representative foundation models (<a href="https://arxiv.org/abs/2512.22819" target="_blank" class="reference-link">DA360</a>, <a href="https://arxiv.org/abs/2512.16913" target="_blank" class="reference-link">DAP</a>, <a href="https://arxiv.org/abs/2509.26618" target="_blank" class="reference-link">DA&sup2;</a>) on Urban360 yields consistent improvements. 
+            The magnitude of improvement is inversely related to base model strength. Against a comparable synthetic dataset (<a href="https://arxiv.org/abs/2603.17571" target="_blank" class="reference-link" title="PanoCity dataset, introduced in the PanoVGGT paper">PanoCity</a>), Urban360 shows better overall transfer performance, highlighting the value of plug-and-play domain matching versus fixed near-range biased datasets.
           </p>
 
           <h3 class="title is-5 mt-5">Table 2. Fine-tuning on Helvipad outdoor (n = 5,022).</h3>
@@ -477,7 +491,7 @@
           </p>
 
           <div class="has-text-centered mt-5">
-            <div class="figure-scroll"><img src="assets/fig3_qualitative.png" alt="Qualitative depth comparison on the Helvipad outdoor benchmark: RGB, LiDAR GT, base, PanoCity-FT, and Urban360-FT"></div>
+            <div class="figure-scroll"><img loading="lazy" src="assets/fig3_qualitative.png" alt="Qualitative depth comparison on the Helvipad outdoor benchmark: RGB, LiDAR GT, base, PanoCity-FT, and Urban360-FT"></div>
             <p class="is-size-6 has-text-grey mt-2">Qualitative depth comparison on the Helvipad outdoor benchmark (three samples). Columns: RGB, LiDAR GT, base (zero-shot), PanoCity-FT, and Urban360-FT (ours), on a shared 0.1&ndash;80 m scale.</p>
           </div>
 
@@ -499,7 +513,7 @@
           </p>
           <div class="has-text-centered mt-4">
             <div class="figure-inset figure-inset-80">
-              <img src="assets/stereo_validation.png" alt="Stereo reprojection error as a function of a global depth scale, minimized at a scale of 1.0 for each of the three scenes and for all views combined" style="width:100%;">
+              <img loading="lazy" src="assets/stereo_validation.png" alt="Stereo reprojection error as a function of a global depth scale, minimized at a scale of 1.0 for each of the three scenes and for all views combined" style="width:100%;">
               <p class="is-size-6 has-text-grey mt-2">Global depth scale validation over the full release: 10,080 views across all three scenes.</p>
             </div>
           </div>
