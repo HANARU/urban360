@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Urban360 Plugin - Reference</title>
-  
-  <link rel="stylesheet" href="assets/docs.css">
+
+  <link rel="stylesheet" href="assets/docs.css?v=20261019">
 </head>
 <body>
 
@@ -35,7 +35,7 @@
 
   <!-- Main Content (RTD Style) -->
   <main class="rtd-main" id="main-content">
-    
+
     <!-- Top Breadcrumb -->
     <header class="rtd-main-header">
       <div>
@@ -49,92 +49,240 @@
     <!-- Scrollable Content Area -->
     <div class="rtd-content-wrapper">
       <div class="rtd-content">
-        
+
         <h1>Reference</h1>
-        <p>This section provides detailed reference materials for configuring the Urban360 plugin, understanding its output structures, and resolving common issues.</p>
+        <p>This section lists the settings of the Urban360 plugin and describes the files it writes.</p>
 
         <!-- 4. Configuration -->
         <div class="section-block" id="configuration">
           <h2>Configuration Parameters</h2>
-          <p>These parameters are configured in <strong>Project Settings &gt; Plugins &gt; Urban360</strong>, not in the actor's Details panel:</p>
+          <p>Capture settings are made on the three pages of the <strong>Capture Tool</strong> and take effect when you press Apply Settings. The same values are stored in <strong>Project Settings &gt; Plugins &gt; Urban360</strong>, where a few have a different name, given in parentheses below. The Lighting Standard and the weather adjustments are on the neighbouring page, <strong>Urban360 Calibration</strong>; the weather adjustments also appear under Calibration on the Env page.</p>
+
+          <h3>Points page</h3>
           <table>
             <thead>
-              <tr>
-                <th>Parameter (Project Settings &gt; Plugins &gt; Urban360)</th>
-                <th>Default</th>
-                <th>Description</th>
-              </tr>
+              <tr><th>Setting</th><th>Default</th><th>Description</th></tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong>Resolution</strong> (internal: <code>AtlasWidth</code>)</td>
-                <td><code>1024</code></td>
-                <td>Pixel width of each eye's 360&deg; image; the height is always half of it. Stereo stacks both eyes into one file, so 1024 writes a 1024&times;1024 file holding two 1024&times;512 views. Range 512&ndash;4096. The released Urban360 Dataset was captured at this setting; the experiments in the paper were run at 1920.</td>
+                <td><strong>Spline Spacing</strong> (Step Size)</td>
+                <td><code>500&nbsp;cm</code></td>
+                <td>Distance between points along each road spline. Must be at least 1 cm.</td>
               </tr>
               <tr>
-                <td><strong>Capture Type</strong></td>
+                <td><strong>Road Width</strong></td>
+                <td><code>1000&nbsp;cm</code></td>
+                <td>Width across which points are spread. Set for each spline.</td>
+              </tr>
+              <tr>
+                <td><strong>Safety Radius</strong></td>
+                <td><code>35&nbsp;cm</code></td>
+                <td>A point with a wall, tree or other obstacle within this radius is dropped.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Capture page</h3>
+          <table>
+            <thead>
+              <tr><th>Setting</th><th>Default</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>RGB / Depth / Normal / Semantic</strong> (Capture Color / Depth / Normal / Semantic)</td>
+                <td>RGB and Depth on; Normal and Semantic off</td>
+                <td>Which images to write, listed under Capture Mode, where All ticks every type. At least one must be on.</td>
+              </tr>
+              <tr>
+                <td><strong>Capture Stereo</strong> (Capture Type)</td>
                 <td><code>Stereo</code></td>
-                <td>Stereo (both eyes) or Mono.</td>
+                <td>Stereo writes both eyes into one file. Mono writes one eye from the rig centre and takes about half the time.</td>
               </tr>
               <tr>
                 <td><strong>Capture Count</strong></td>
                 <td><code>Single</code></td>
-                <td>A single centre node, or a 9-node isotropic cluster (Group).</td>
+                <td>Single captures one image per point. Group captures a nine-node cluster around it, which takes nine times the data and the time.</td>
               </tr>
               <tr>
-                <td><strong>Capture Height</strong></td>
-                <td><code>160 cm</code></td>
-                <td>Camera height above the actual ground surface (re-measured per point via a downward raycast).</td>
+                <td><strong>Camera Height</strong> (Capture Height)</td>
+                <td><code>160&nbsp;cm</code></td>
+                <td>Camera height above the actual ground under the point, measured again for every point.</td>
               </tr>
               <tr>
-                <td><strong>Capture Color / Depth / Normal / Semantic</strong></td>
-                <td>Color, Depth, Normal on; Semantic off</td>
-                <td>Per-modality capture toggles.</td>
-              </tr>
-              <tr>
-                <td><strong>Adaptive Exposure</strong></td>
-                <td><code>On</code></td>
-                <td>Meters the scene once per panorama and freezes that EV across all 168 slices. Off uses a fixed bias of 2.0.</td>
-              </tr>
-              <tr>
-                <td><strong>Exposure Target Grey</strong></td>
-                <td><code>0.06</code></td>
-                <td>Master brightness target for colour (EV = log<sub>2</sub>(metered / target)).</td>
-              </tr>
-              <tr>
-                <td><strong>Exposure Min / Max EV</strong></td>
-                <td><code>&minus;6.0 / 2.0</code></td>
-                <td>Exposure clamps.</td>
+                <td><strong>Local Step</strong> (Grid Distance)</td>
+                <td><code>10&nbsp;cm</code></td>
+                <td>Spacing of the Group cluster. Unused with Single.</td>
               </tr>
             </tbody>
           </table>
-          <div class="admonition note">
-            <p class="admonition-title">Stereo baseline</p>
-            <p>Note: the stereo baseline is fixed at 6.4 cm total (&plusmn;3.2 cm per eye) through the <code>DG.EyeSeparation</code> console variable; it is not a Details-panel field.</p>
+
+          <h3>Env page</h3>
+          <table>
+            <thead>
+              <tr><th>Setting</th><th>Default</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Time of Day / Weather</strong></td>
+                <td><code>Day</code> / <code>None</code></td>
+                <td>Day or Night. The weather list offers None, Rain, Snow and Fog.</td>
+              </tr>
+              <tr>
+                <td><strong>Env Name</strong> (Environment Name)</td>
+                <td><code>Default</code></td>
+                <td>Name of the output folder. If it names a time of day or a weather, such as <code>Day_Clear</code>, Setup &amp; Verify checks that it matches the condition applied.</td>
+              </tr>
+              <tr>
+                <td><strong>Start Index</strong></td>
+                <td><code>1</code></td>
+                <td>First SceneID a run captures, which is how a stopped run is resumed. New points are numbered from it as well.</td>
+              </tr>
+              <tr>
+                <td><strong>Current Path</strong> (Root Data Path)</td>
+                <td><code>&lt;Project&gt;/Saved/Urban360Data</code></td>
+                <td>Output root, chosen with Browse Path.</td>
+              </tr>
+              <tr>
+                <td><strong>Resolution</strong> (internal: <code>AtlasWidth</code>)</td>
+                <td><code>1024</code></td>
+                <td>Pixel width of each eye's 360&deg; image; the height is half of it. Stereo stacks both eyes into one file, so 1024 writes a 1024&times;1024 file holding two 1024&times;512 views. Even values from 512 to 4096; above 2048 Setup &amp; Verify warns about memory. The Urban360 Dataset is captured at 1024; the experiments in the paper were run at 1920.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Urban360 Calibration</h3>
+          <table>
+            <thead>
+              <tr><th>Setting</th><th>Default</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Day Lighting / Night Lighting</strong> (Lighting Standard)</td>
+                <td>Day: sun 3 lux at 60&deg; elevation and &minus;15&deg; azimuth, 6500 K, sky light 1.0<br>Night: sun 0.5 lux at 0&deg; elevation, sky light 2.0</td>
+                <td>The light every capture is taken under, in place of the level's own sun, sky light, sky and fog, so that all worlds are shot under the same light. The weather scales this sun. A changed standard raises the note E014, and the manifest records what was rendered (<code>sun</code>, <code>skyl</code>).</td>
+              </tr>
+              <tr>
+                <td><strong>Hide Practical Lights</strong></td>
+                <td><code>Off</code></td>
+                <td>On also hides the level's point, spot and rect lights. Off keeps street lamps and other practical lights in the shot.</td>
+              </tr>
+              <tr>
+                <td><strong>Use Level Post Process</strong></td>
+                <td><code>Off</code></td>
+                <td>On lets the level's PostProcessVolume grade the Color images (colour temperature, saturation, contrast, curves). Off gives every world the same grading.</td>
+              </tr>
+              <tr>
+                <td><strong>Weather Fog Scale</strong></td>
+                <td><code>1.0</code></td>
+                <td>Scales the fog of the active weather.</td>
+              </tr>
+              <tr>
+                <td><strong>Weather Sky Light Boost</strong></td>
+                <td><code>1.0</code></td>
+                <td>Scales the sky light under bad weather. Earlier versions defaulted to 30, and the value is saved on each PC, so check it on a machine that ran an older version.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Project Settings only</h3>
+          <table>
+            <thead>
+              <tr><th>Setting</th><th>Default</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Stream Settle Timeout</strong></td>
+                <td><code>10&nbsp;s</code></td>
+                <td>At every point, the longest the tool waits for the world to finish loading and for shaders to compile (<em>Urban360 &gt; Capture</em>).</td>
+              </tr>
+              <tr>
+                <td><strong>Semantic Data Table</strong></td>
+                <td>The plugin's own table</td>
+                <td>The table of categories (<em>Urban360 &gt; Semantic</em>). To change the categories, duplicate the plugin's table into your project and set the copy here; updating the plugin replaces its own table.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="admonition warning">
+            <p class="admonition-title">Exposure settings do not change the image</p>
+            <p>Adaptive Exposure, Exposure Target Gray and Exposure Min/Max EV are advanced settings marked <em>record only</em>. They change only the <code>ExposureEV</code> value the manifest records. Every Color image is tonemapped at a fixed exposure of 1.0, so pixel values can be compared across points, scenes and conditions without normalization. Night images therefore come out dark; brighten them afterwards to look at them.</p>
           </div>
           <div class="admonition note">
-            <p class="admonition-title">Semantic segmentation</p>
-            <p>Semantic segmentation is implemented in the plugin but is not part of the v1 release. It will be enabled in a future update, together with a semantic sample and its class taxonomy.</p>
+            <p class="admonition-title">Stereo baseline</p>
+            <p>The stereo baseline is fixed at 6.4 cm (&plusmn;3.2 cm per eye) through the <code>DG.EyeSeparation</code> console variable; it is not a field in the tool. Mono renders from the rig centre, and <code>StitchParams</code> records <code>eyesep</code> (0 for Mono). Mono captures made before 12 October 2026 have no <code>eyesep</code> and were rendered 3.2 cm to the left of the recorded position.</p>
+          </div>
+          <div class="admonition note">
+            <p class="admonition-title">Semantic labels</p>
+            <p>With Semantic on, the plugin writes an 8-bit RGB PNG in which the colour of a pixel is its category; the category number itself is not stored. The default category table is based on Cityscapes and is not final, so it is not listed here. Labels are set up for each level, by assigning categories to actors, by mesh-path rules, by actor-class mappings and by landscape paint layers. Setup &amp; Verify does not pass while objects the camera can see have no label. MASS crowds and traffic exist only during the capture, so this check cannot see them.</p>
           </div>
         </div>
 
         <!-- 5. Output Format -->
         <div class="section-block" id="output-format">
           <h2>Output Format</h2>
-          <p>The plugin writes three separate FP16 EXR files per view, not one multi-channel file. Each file is W &times; W, HALF float, ZIP-compressed, RGBA. The two stereo eyes are stacked in each file (left on top, right on bottom), so each eye is a W &times; W/2 equirectangular image.</p>
+          <p>For every capture position the plugin writes the files below into the scene folder and one row into the scene's manifest. The EXR files are W &times; W, HALF float, ZIP-compressed, RGBA, one file per image type rather than one multi-channel file. Stereo stacks the two eyes in every image file (left on top, right on bottom), so each eye is a W &times; W/2 equirectangular image.</p>
           <ul>
-            <li><strong>Color</strong> (<code>{scene}_pos5_color.exr</code>): ACES-tonemapped LDR in linear light (no sRGB gamma), range [0, 1], alpha = 1. Apply an sRGB transfer before display or before feeding sRGB-trained backbones.</li>
-            <li><strong>Depth</strong> (<code>{scene}_pos5_depth.exr</code>): R = G = B = radial distance (metres) to the first surface the ray meets. Sky = 65504.0, invalid = 0.0 (use <code>valid = depth &lt; 65504.0</code>). Alpha = translucency mask (1 = opaque, 0 = a translucent surface came first).</li>
-            <li><strong>Normal</strong> (<code>{scene}_pos5_normal.exr</code>): RGB = unit surface normal in CV coordinates, derived from the depth. Alpha = validity mask (1 = valid, 0 = invalid).</li>
+            <li><strong>Color</strong> (<code>&lt;SceneID&gt;_pos5_color.exr</code>): ACES-tonemapped LDR in linear light (no sRGB gamma), range [0, 1], alpha = 1. The exposure is fixed at 1.0 whatever <code>ExposureEV</code> says, so pixel values compare directly across points, scenes and conditions. Rendered without Lumen, so there is no bounced light. Apply an sRGB transfer before display or before feeding sRGB-trained backbones.</li>
+            <li><strong>Depth</strong> (<code>&lt;SceneID&gt;_pos5_depth.exr</code>): R = G = B = radial distance (metres) to the first surface the ray meets. Sky = 65504.0, invalid = 0.0 (use <code>valid = depth &lt; 65504.0</code>). Alpha = translucency mask (1 = opaque, 0 = a translucent surface came first). A translucent material that writes its own depth (<em>Output Depth and Velocity</em>) stays at A = 1; its distance is still correct.</li>
+            <li><strong>Normal</strong> (<code>&lt;SceneID&gt;_pos5_normal.exr</code>): RGB = unit surface normal in CV coordinates, derived from the depth. Alpha = validity mask (1 = valid, 0 = invalid). Invalid pixels are the sky and pixels whose orientation could not be measured, written as RGB (0, 0, 0), so <code>normal.A == 0</code> is a larger set than <code>depth &gt;= 65504</code>. Normals near the zenith and the nadir are measured like everywhere else.</li>
+            <li><strong>Semantic</strong> (<code>&lt;SceneID&gt;_pos5_semantic.png</code>, optional): 8-bit RGB, one colour per category, with the eyes stacked like the EXR files.</li>
+            <li><strong>Depth behind translucency</strong> (<code>&lt;SceneID&gt;_pos5_depth_behind.exr</code>, optional): written only when the console variable <code>DG.Depth.WriteBehindLayer</code> is 1. It records the opaque surface behind glass and water, for work on multi-layer depth.</li>
+            <li><strong>Pixel to direction:</strong> pixel-corner convention. In an eye image of width W and height H = W/2, pixel (x, y) looks along longitude &theta; = x / W &middot; 360&deg; and polar angle &phi; = y / H &middot; 180&deg;. Row 0 is exactly the zenith and the last row is half a pixel above the nadir; column 0 faces the rig's forward direction, and the view turns right as the column grows. Reading with the common (x + 0.5) / W convention shifts every direction by half a pixel (0.18&deg; at W = 1024).</li>
             <li><strong>Coordinate frame:</strong> CV standard (X-right, Y-down, Z-forward), metres.</li>
-            <li><strong>Camera Pose:</strong> <code>{scene}_manifest.csv</code>, one row per node, columns: <code>Filename, PosX, PosY, PosZ, Qw, Qx, Qy, Qz, ExposureEV, DepthConvention, TranslucentElements, TranslucentPct, StitchParams, RenderParams</code>. Position in metres, unit quaternion in WXYZ order, CV frame. Pose is not stored in the EXR and not in a <code>metadata.json</code>.</li>
+            <li><strong>Camera Pose:</strong> <code>&lt;SceneID&gt;_manifest.csv</code>, one row per completed position, columns: <code>Filename, PosX, PosY, PosZ, Qw, Qx, Qy, Qz, ExposureEV, DepthConvention, TranslucentElements, TranslucentPct, StitchParams, RenderParams</code>. Position in metres, unit quaternion in WXYZ order with <code>Qw &ge; 0</code>, CV frame. Pose is not stored in the EXR and not in a <code>metadata.json</code>. <code>ExposureEV</code> is what the exposure meter asked for, not what was applied.</li>
           </ul>
-          <pre><code>&lt;Environment&gt;/&lt;SceneID&gt;/
-    &lt;SceneID&gt;_pos5_color.exr   &lt;SceneID&gt;_pos5_depth.exr   &lt;SceneID&gt;_pos5_normal.exr
-    &lt;SceneID&gt;_manifest.csv</code></pre>
+          <p>A position that stalled or whose files could not all be written gets no row, and a row from an earlier run of the same position is dropped with it. Files in a scene folder without a manifest row are therefore incomplete. Images and manifests are written to a <code>.part</code> file first and renamed when complete, so a file under its final name is never cut short.</p>
+          <pre><code>&lt;Current Path&gt;/&lt;Env Name&gt;/
+    _run_&lt;date&gt;-&lt;time&gt;.txt
+    &lt;SceneID&gt;/
+        &lt;SceneID&gt;_pos5_color.exr   &lt;SceneID&gt;_pos5_depth.exr   &lt;SceneID&gt;_pos5_normal.exr
+        &lt;SceneID&gt;_pos5_semantic.png
+        &lt;SceneID&gt;_manifest.csv</code></pre>
+
+          <h3>Provenance keys in the manifest</h3>
+          <p><code>StitchParams</code> and <code>RenderParams</code> hold <code>key=value</code> pairs separated by semicolons, so new keys never change the number of columns. They record the values actually rendered, not the values requested.</p>
+          <table>
+            <thead>
+              <tr><th>Key</th><th>Meaning</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>h</code>, <code>v</code></td><td>StitchParams. Horizontal and vertical step between slices, in degrees (15 and 30).</td></tr>
+              <tr><td><code>fov</code></td><td>StitchParams. Field of view each slice was rendered at, in degrees (40). <code>30.0</code> marks a capture made before October 2026, with the stitching defects listed below.</td></tr>
+              <tr><td><code>ov</code>, <code>blendh</code>, <code>blendv</code>, <code>guardh</code>, <code>guardv</code></td><td>StitchParams. Requested blend width, the horizontal and vertical blend widths actually applied, and the guard added to each strip, in degrees.</td></tr>
+              <tr><td><code>tau</code>, <code>w</code>, <code>ss</code></td><td>StitchParams. Edge threshold of the depth stitching, Resolution, and whether Color averages over each pixel's area (1) or samples its centre (0).</td></tr>
+              <tr><td><code>eyesep</code></td><td>StitchParams. Distance between the eyes in cm; 0 for Mono, which renders from the rig centre.</td></tr>
+              <tr><td><code>refl</code></td><td>RenderParams. The project's reflection method. This is a project setting only; it does not mean Lumen reflections ran.</td></tr>
+              <tr><td><code>lumenfront</code></td><td>RenderParams. Whether the plugin switched on Lumen front-layer reflections for the capture, which it does when the project's reflection method is Lumen. It has no effect, because Lumen does not run in scene captures.</td></tr>
+              <tr><td><code>ssr</code></td><td>RenderParams. Whether screen-space reflection was on. With 1, reflections on water and glass can differ from slice to slice; this key, not <code>refl</code>, says whether reflective pixels carry that artefact.</td></tr>
+              <tr><td><code>colorgi</code>, <code>colorrefl</code></td><td>RenderParams. Global illumination and reflection method the Color slices actually used; <code>none</code> by default.</td></tr>
+              <tr><td><code>colorvs</code>, <code>colorwarm</code></td><td>RenderParams. An experimental option, off by default (<code>colorvs=0</code>), and the number of frames each Color slice was rendered before it was read.</td></tr>
+              <tr><td><code>dfao</code></td><td>RenderParams. Distance-field sky occlusion in the Color pass. <code>0</code> in current captures; with it on, shade came out black.</td></tr>
+              <tr><td><code>exposure</code></td><td>RenderParams. <code>fixed1</code>: the Color image was rendered at exposure 1.0.</td></tr>
+              <tr><td><code>levelpp</code></td><td>RenderParams. Whether the level's PostProcessVolume graded the Color image (Use Level Post Process).</td></tr>
+              <tr><td><code>sun</code>, <code>skyl</code></td><td>RenderParams. The sun actually rendered, as illuminance in lux at elevation and azimuth (after the weather scaling), and the sky light intensity.</td></tr>
+              <tr><td><code>substrate</code></td><td>RenderParams. Whether the project uses Substrate materials.</td></tr>
+              <tr><td><code>planaroff</code>, <code>bloom</code>, <code>localexp</code>, <code>lightshafts</code>, <code>fringe</code>, <code>dof</code></td><td>RenderParams. Number of planar reflection actors hidden during the capture, and whether bloom, local exposure, light shafts, chromatic aberration and depth of field were on. The screen-wide effects are turned off because each slice is its own screen.</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Telling capture versions apart</h3>
+          <p>Captures made with earlier versions of the plugin have known defects. The manifest shows which version a capture came from:</p>
+          <table>
+            <thead>
+              <tr><th>In the manifest</th><th>What it means</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>fov=30.0</code> and no <code>blendv</code> in StitchParams</td><td>Stitched before October 2026. One row reads a direction up to 0.26&deg; off (row 128 of each eye at a Resolution of 1024), Color can show horizontal lines at the slice boundaries (&plusmn;15, &plusmn;45 and &plusmn;75&deg; elevation), and fine periodic detail can turn into moir&eacute;.</td></tr>
+              <tr><td>No <code>dfao</code>, or <code>dfao=1</code>, in RenderParams</td><td>Surfaces the sun does not reach receive no sky light, so shade can be near black, and rain, snow and fog keep sharp sun shadows with black interiors.</td></tr>
+              <tr><td>Captured before 10 October 2026</td><td>Normals that could not be measured are marked valid (a vertical normal with A = 1), and the quaternion sign varies (flip all four components where <code>Qw &lt; 0</code>).</td></tr>
+              <tr><td>No <code>eyesep</code> in StitchParams</td><td>Mono was rendered 3.2 cm to the left of the recorded position, and normals within 8.6&deg; of the zenith and nadir were blended toward vertical.</td></tr>
+              <tr><td>Night capture in Rain, Snow or Fog made before 12 October 2026 (no manifest key; a row without <code>sun</code> in RenderParams is older still)</td><td>The sky dome kept its daytime colours, a blue-orange sky with a bright sun disc above a night scene, and the shade was lit more than the Night Lighting standard says. Do not use these as night data.</td></tr>
+            </tbody>
+          </table>
+
           <div class="admonition note">
-            <p class="admonition-title">Bundled reference documents</p>
-            <p>The plugin ships two authoritative reference documents: <code>Urban360_Dataset_Architecture.md</code> (the output contract) and <code>Urban360_Dataset_ERRATA.md</code> (paper-versus-release differences). Both ship with the plugin and will be distributed alongside the dataset.</p>
+            <p class="admonition-title">Bundled reference document</p>
+            <p>The plugin ships <code>Urban360_Troubleshooting.md</code>, which explains every problem code. The output conventions are described on this page, and the dataset will be distributed with its own errata.</p>
           </div>
         </div>
 

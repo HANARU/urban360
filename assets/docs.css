@@ -1,6 +1,8 @@
 /* Shared shell for the Urban360 documentation pages.
    Loaded by documentation.html, documentation_reference.html and
-   documentation_support.html; edit here rather than in any one page. */
+   documentation_support.html; edit here rather than in any one page.
+   When editing this file, bump the ?v= query on its <link> in all three
+   pages, since GitHub Pages caches it for 10 minutes. */
 
 /* Reset & Base Typography */
 * { box-sizing: border-box; }
@@ -165,6 +167,9 @@ img { max-width: 100%; height: auto; }
   h1 { font-size: 1.75em; }
   h2 { font-size: 1.35em; }
   p, li { font-size: 1em; }
+  /* Paths such as <YourProject>/Plugins/Sim2RealDataGen/ have no spaces and
+     would otherwise run past the right edge of a phone screen. */
+  code { overflow-wrap: anywhere; }
   /* Fixed layout wraps the cells instead of pushing the table off-screen,
      so nothing is hidden behind a horizontal scroll the reader has to find. */
   table { table-layout: fixed; overflow-wrap: break-word; }

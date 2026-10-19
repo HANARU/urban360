@@ -118,7 +118,7 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            Simulation-based data generation is essential for training and evaluating equirectangular panoramic (ERP) depth estimation models, where dense real-world ground truth (GT) is difficult to obtain. However, existing resources are either fixed pre-generated panoramic datasets or flexible generators designed mainly for perspective cameras, and therefore do not simultaneously provide panoramic output, scene-level flexibility, and geometrically consistent multimodal ground truth. We propose <b>Urban360</b>, a plug-and-play Unreal Engine 5 (UE5) plugin pipeline that generates panoramic synthetic data (RGB, Depth, Normal, and Camera Pose) for arbitrary UE5 scenes under a specified coordinate convention with pixel-wise consistency, together with the resulting <b>Urban360 Dataset</b> (3 scenes, 10,080 views). The pipeline renders RGB with Lumen global illumination (hardware ray tracing) and captures Depth from the geometry buffer for dense GT that sparse real-world LiDAR cannot provide, and stitches a low-distortion ERP via a 168-slice Geometric Look-Up Table (GeoLUT); Surface Normal is derived from GT Depth at the capture resolution, keeping all image modalities pixel-wise consistent in a unified FP16 EXR format. To validate the pipeline output, we use real-world outdoor panoramic depth estimation as a downstream task: fine-tuning three representative models (DA360, DAP, DA&sup2;) on Urban360 yields consistent improvements on the Helvipad outdoor benchmark, and under a matched protocol it achieves better overall transfer performance than the competing synthetic dataset PanoCity. The Urban360 plugin and dataset will be publicly released upon publication.
+            Simulation-based data generation is essential for training and evaluating equirectangular panoramic (ERP) depth estimation models, where dense real-world ground truth (GT) is difficult to obtain. However, existing resources are either fixed pre-generated panoramic datasets or flexible generators designed mainly for perspective cameras, and therefore do not simultaneously provide panoramic output, scene-level flexibility, and geometrically consistent multimodal ground truth. We propose <b>Urban360</b>, a plug-and-play Unreal Engine 5 (UE5) plugin pipeline that generates panoramic synthetic data (RGB, Depth, Normal, and Camera Pose) for arbitrary UE5 scenes under a specified coordinate convention with pixel-wise consistency, together with the resulting <b>Urban360 Dataset</b> (3 scenes, 10,080 views). The pipeline renders RGB through SceneCapture with UE5's deferred renderer and captures Depth from the geometry buffer for dense GT that sparse real-world LiDAR cannot provide, and stitches a low-distortion ERP via a 168-slice Geometric Look-Up Table (GeoLUT); Surface Normal is derived from GT Depth at the capture resolution, keeping all image modalities pixel-wise consistent in a unified FP16 EXR format. To validate the pipeline output, we use real-world outdoor panoramic depth estimation as a downstream task: fine-tuning three representative models (DA360, DAP, DA&sup2;) on Urban360 yields consistent improvements on the Helvipad outdoor benchmark, and under a matched protocol it achieves better overall transfer performance than the competing synthetic dataset PanoCity. The Urban360 plugin and dataset will be publicly released upon publication.
           </p>
         </div>
       </div>
@@ -135,17 +135,17 @@
         <h2 class="title is-3 has-text-centered">What is the Urban360 Plugin?</h2>
         <div class="content has-text-justified">
           <p>
-            Unlike fixed synthetic datasets (e.g., pre-rendered image archives), <strong>Urban360 is provided as a drag-and-drop Unreal Engine 5 plugin</strong>. It empowers researchers to generate their own custom panoramic data from any UE5 environment to match their target domain.
+            Unlike fixed synthetic datasets (e.g., pre-rendered image archives), <strong>Urban360 is provided as a plug-and-play Unreal Engine 5 plugin</strong>. It empowers researchers to generate their own custom panoramic data from any UE5 environment to match their target domain.
           </p>
           <ul>
-            <li><strong>Drag-and-Drop Setup:</strong> Simply place the <code>CapturePoint</code> actor into your scene.</li>
-            <li><strong>Automated Capture:</strong> The plugin automatically captures 168 narrow-FOV slices using hardware-accelerated Lumen global illumination.</li>
+            <li><strong>Spline-Based Setup:</strong> Draw a road spline in your level and generate capture points along it from the Capture Tool.</li>
+            <li><strong>Automated Capture:</strong> At every point the plugin automatically renders 168 narrow-FOV slices through SceneCapture, under a fixed lighting standard and a chosen time of day and weather.</li>
             <li><strong>Seamless Export:</strong> It stitches the slices via a precomputed GeoLUT and exports perfectly aligned RGB, continuous Depth (meters), and Surface Normal as <strong>three separate FP16 EXR files (Color, Depth, Normal) plus a camera-pose manifest CSV</strong>.</li>
-            <li><strong>Binary Release:</strong> The plugin ships compiled for Unreal Engine 5.7 and installs into any project, Blueprint-only ones included, with no build step. Its source code is not published.</li>
+            <li><strong>Binary Release:</strong> The plugin ships compiled for Unreal Engine 5.7 on Windows 64-bit and installs into any project, Blueprint-only ones included, with no build step. Its source code is not published.</li>
           </ul>
           <div class="has-text-centered mt-5">
-            <img loading="lazy" src="assets/plugin_ui.jpg" alt="The Urban360 Dataset Generator panel docked in the Unreal Editor, with capture points placed along a path in the viewport and the Capture tab showing the stereo mode, per-modality toggles, capture count, camera height and local step" style="width:100%; border: 1px solid #dbdbdb; border-radius: 4px;">
-            <p class="is-size-6 has-text-grey mt-2">The Dataset Generator panel inside the Unreal Editor. Capture points sit along a path in the level, and the Capture tab selects the stereo mode, the modalities to write, the capture count, the camera height and the local step.</p>
+            <img loading="lazy" src="assets/plugin_ui.jpg" alt="The Urban360 Capture Tool docked in the Unreal Editor beside a park level, with capture points placed along a road spline across a bridge and the Capture page showing the stereo mode, the Capture Target box of the selected point, the image types, the capture count, the camera height and the local step" style="width:100%; border: 1px solid #dbdbdb; border-radius: 4px;">
+            <p class="is-size-6 has-text-grey mt-2">The Capture Tool docked in the Unreal Editor. Capture points sit along a road spline across a bridge, and the Capture page sets the stereo mode, the image types, the capture count, the camera height and the local step. Capture Target shows whether the selected point will be shot.</p>
           </div>
         </div>
       </div>
@@ -162,12 +162,12 @@
         <div class="content">
           <article class="message is-info">
             <div class="message-body">
-              <strong>Dense GT Real Sensors Cannot Capture:</strong> Rotating LiDAR on benchmarks like Helvipad provides valid labels for only about <strong>12%</strong> of ERP pixels (raised to 61% by depth completion). Physically based rendering (Lumen) yields dense GT even on glass, reflective, and low-light regions. <br><br>
+              <strong>Dense GT Real Sensors Cannot Capture:</strong> Rotating LiDAR on benchmarks like Helvipad provides valid labels for only about <strong>12%</strong> of ERP pixels (raised to 61% by depth completion). Rendered depth is dense everywhere, and because the plugin records the first surface the camera meets, GT stays dense even on glass, reflective, and low-light regions. <br><br>
               <strong>Plug-and-Play Advantage:</strong> Since Urban360 is a plug-and-play plugin for arbitrary UE5 scenes, it allows generating data tailored to the target domain, overcoming the negative transfer often caused by fixed synthetic datasets like PanoCity.
             </div>
           </article>
           <ul>
-            <li><strong>(i)</strong> A plug-and-play UE5 plugin pipeline that generates panoramic (ERP) synthetic data for arbitrary UE5 scenes; to our knowledge the first to jointly export RGB, Depth, Normal, and Camera Pose under a specified coordinate convention with pixel-wise consistency, using Lumen global illumination (hardware ray tracing) and 168-slice GeoLUT ERP stitching.</li>
+            <li><strong>(i)</strong> A plug-and-play UE5 plugin pipeline that generates panoramic (ERP) synthetic data for arbitrary UE5 scenes, jointly exporting RGB, Depth, Normal, and Camera Pose under a specified coordinate convention with pixel-wise consistency, using 168-slice GeoLUT ERP stitching.</li>
             <li><strong>(ii)</strong> The Urban360 Dataset (3 scenes, 10,080 views) in a unified FP16 EXR format, with Surface Normal derived from GT Depth at the capture resolution (Eq. 1) for pixel-wise consistency.</li>
             <li><strong>(iii)</strong> Using real-world outdoor panoramic depth estimation as a downstream task, fine-tuning three representative models (DA360, DAP, DA&sup2;) on Urban360 gives consistent improvements on Helvipad outdoor (AbsRel &minus;9 to &minus;33%, &delta;<sub>1</sub> +12 to +109%) and better overall transfer than the competing synthetic dataset PanoCity under a matched protocol.</li>
           </ul>
@@ -186,7 +186,11 @@
         
         <div class="has-text-centered" style="margin-bottom: 20px;">
           <div class="figure-scroll"><img loading="lazy" src="assets/fig1_pipeline.png" alt="The Urban360 capture pipeline: anchor sampling, 168 narrow-FOV slices, GeoLUT equirectangular stitching, and FP16 EXR output"></div>
-          <p class="is-size-6 has-text-grey mt-2">The Urban360 capture pipeline: (a) anchor sampling along a road-spline path in a UE5 scene, (b) 168 narrow-FOV slices (24&times;7, 30&deg;&times;30&deg;) captured via SceneCapture with Lumen ray tracing, (c) GeoLUT equirectangular stitching, and (d) FP16 EXR output (RGB, Depth, Normal) with camera pose.</p>
+          <p class="is-size-6 has-text-grey mt-2">The Urban360 capture pipeline: (a) anchor sampling along a road-spline path in a UE5 scene, (b) 168 narrow-FOV slices (24&times;7, 30&deg;&times;30&deg;) rendered via SceneCapture with UE5's deferred renderer, (c) GeoLUT equirectangular stitching, and (d) FP16 EXR output (RGB, Depth, Normal) with camera pose.</p>
+        </div>
+
+        <div class="notification is-info is-light">
+          <strong>Rendering correction (October 2026).</strong> The slices are rendered by UE5&rsquo;s deferred renderer through SceneCapture. In Unreal Engine 5.7, scene captures run without Lumen global illumination and Lumen reflections unless a capture turns them back on, and the plugin never did, so no capture behind this work, including the data used in the paper, was rendered with Lumen. Dense GT on glass and water comes from the plugin&rsquo;s first-surface depth pass, not from Lumen: depth and normals are geometric and do not depend on lighting. This corrects the description of the rendering in the paper; the reported results are unaffected.
         </div>
 
         <div class="content">
@@ -210,8 +214,8 @@
             
             <div class="has-text-centered mt-5">
                <div class="figure-inset figure-inset-90">
-                 <img loading="lazy" src="assets/stitching_ssr_lumen.png" alt="Two equirectangular crops of a lakeside scene, one rendered with screen-space reflection and one with Lumen front-layer tracing, above a Fourier spectrum of the water surface in which the peak at the slice frequency is lower for Lumen">
-                 <p class="is-size-6 has-text-grey mt-2">Screen-space reflection (top) versus Lumen front-layer tracing (middle) on a water surface. The two crops look identical, but in the Fourier spectrum of the water the peak at the slice frequency (period = <em>W</em>/24) falls to 0.64&times; of the screen-space level: a traced reflection no longer depends on which slice the pixel came from.</p>
+                 <img loading="lazy" src="assets/stitching_ssr_off.png" alt="Two equirectangular crops of a lakeside scene, one with screen-space reflection on and one with it off, above a Fourier spectrum of the water surface in which the peak at the slice frequency is lower with screen-space reflection off">
+                 <p class="is-size-6 has-text-grey mt-2">Screen-space reflection on (top) and off (middle) on a water surface. The two crops look identical, but in the Fourier spectrum of the water the peak at the slice frequency (period = <em>W</em>/24) falls to 0.64&times; of the screen-space level: screen-space reflection only sees what is inside each slice, so with it off a reflection no longer depends on which slice the pixel came from. Water and glass then reflect reflection captures and the sky light.</p>
                </div>
             </div>
           </div>

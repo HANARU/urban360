@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Urban360 Plugin - Support</title>
   
-  <link rel="stylesheet" href="assets/docs.css">
+  <link rel="stylesheet" href="assets/docs.css?v=20261019">
 </head>
 <body>
 
@@ -56,9 +56,68 @@
         <!-- 6. Troubleshooting -->
         <div class="section-block" id="troubleshooting">
           <h2>Troubleshooting & FAQs</h2>
+
+          <h3>Problem codes</h3>
+          <p>The capture tool reports every problem with a short code, such as <code>S007</code> or <code>C001</code>. The code appears in the Setup &amp; Verify window, in the notifications at the bottom right of the editor, in the Output Log (as <code>[C001] ...</code>) and in the run report written next to your data. <code>Urban360_Troubleshooting.md</code> in the plugin folder explains every code: what happened, why, and what to do. The letter says where a problem comes from:</p>
+          <table>
+            <thead>
+              <tr><th>Letter</th><th>Area</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>S</code></td><td>Installing the plugin and preparing a capture</td></tr>
+              <tr><td><code>M</code></td><td>Semantic labels</td></tr>
+              <tr><td><code>E</code></td><td>Environment: time of day, weather, sky and lights</td></tr>
+              <tr><td><code>C</code></td><td>A capture run</td></tr>
+              <tr><td><code>D</code></td><td>Depth, stitching and rendering</td></tr>
+              <tr><td><code>P</code></td><td>Capture points and saving the level</td></tr>
+              <tr><td><code>O</code></td><td>Output files</td></tr>
+              <tr><td><code>X</code></td><td>Internal errors</td></tr>
+            </tbody>
+          </table>
+          <p>Each code also has a severity. <strong>Block</strong>: Setup &amp; Verify does not pass until it is fixed. <strong>Error</strong>: data was not written, or was written wrong. <strong>Warning</strong>: data may be worse than it should be. <strong>Note</strong>: not a fault, but good to know. When you report a problem, send the run report and the editor log (<code>Saved/Logs/&lt;ProjectName&gt;.log</code>).</p>
+
+          <h3>Using the plugin</h3>
+          <div class="admonition warning">
+            <p class="admonition-title">Play ends at once with "Nothing to capture" (S007).</p>
+            <p>Every point has its Capture Target box cleared, or every ticked point comes before Start Index. Press Target All on the Points page, or lower Start Index on the Env page.</p>
+          </div>
+          <div class="admonition warning">
+            <p class="admonition-title">A run stopped, or some points were skipped (C001).</p>
+            <p>Read the run report (<code>_run_&lt;date&gt;-&lt;time&gt;.txt</code>). Its Resume line gives the Start Index that continues a stopped run, and its Incomplete line lists the points that stalled for 120 seconds or whose files could not be written. Those positions have no row in the manifest. Capture them again: every Play captures all points whose Capture Target box is ticked from Start Index on, so set Start Index, or use the Point List to shoot only those points.</p>
+          </div>
+          <div class="admonition warning">
+            <p class="admonition-title">Shade comes out almost black (E015).</p>
+            <p>Captures are taken without Lumen, so shade is lit only by the sky light of the Lighting Standard. When that is too low for a level's materials, the run raises the note E015, and the run report's Shade line gives how much of the image came out near black. If the shade should be visible, raise Sky Light under <em>Project Settings &gt; Plugins &gt; Urban360 Calibration &gt; Lighting Standard</em> (try 2 or 3) and capture a point again. In one project with Substrate turned on, raising the sky light changed nothing, and turning Substrate off was the known way out. Captures made before 9 October 2026 had black shade for a different reason; see <a href="documentation_reference.html#output-format">Telling capture versions apart</a>.</p>
+          </div>
+          <div class="admonition warning">
+            <p class="admonition-title">Capture points are off the ground (P006, C007, C008).</p>
+            <p>A capture point marks the spot on the ground the camera stands over. Points moved by hand or dropped onto other objects can sit above or below it. Setup &amp; Verify lists them and offers to put them back; answer Yes and save the level. If there is no ground within reach under a point (C007), move the point onto the ground. In a World Partition level, wait until the level has finished loading before checking: right after opening, some ground has no collision yet.</p>
+          </div>
+          <div class="admonition warning">
+            <p class="admonition-title">Setup &amp; Verify reports objects without a label (M003).</p>
+            <p>With Semantic on, every object the camera can see needs a category. An unlabelled object would be written as 0, which looks like a valid label to anything that reads the files later. Click a row in the Setup &amp; Verify window to select those objects, then assign a category on the Semantic page. In a World Partition level, load every region first.</p>
+          </div>
+          <div class="admonition warning">
+            <p class="admonition-title">The editor slows to a crawl or closes at a high Resolution (S011).</p>
+            <p>The images of one point take about 1 GB of memory in stereo at a Resolution of 1024, 5 GB at 2048 and 18 GB at 4096 (mono about two thirds of that), on top of what the level itself needs while playing. Lower Resolution on the Env page and press Apply Settings.</p>
+          </div>
+          <div class="admonition warning">
+            <p class="admonition-title">Reflections on water or glass differ from slice to slice.</p>
+            <p>Check the manifest's <code>ssr</code> key in <code>RenderParams</code>, not <code>refl</code>. When the project's reflection method is Lumen, the plugin turns screen-space reflection off for the capture (<code>ssr=0</code>): water and glass then reflect only reflection captures and the sky light, and no slice-to-slice difference arises. When the project uses screen-space reflection, the plugin leaves it on and warns (D003, <code>ssr=1</code>). Each slice then reflects only what is inside its own view, so reflections can differ between neighbouring slices. Lumen itself does not run in scene captures, so <code>refl=lumen_hardware</code> does not mean the reflections were traced.</p>
+          </div>
+          <div class="admonition warning">
+            <p class="admonition-title">Can the capture project be packaged as a game?</p>
+            <p>No. Setup &amp; Verify sets the level's GameMode to the capture GameMode, and the capture classes live in an editor-only module that is not packaged, so such a level cannot run in a packaged build. Use a separate copy of the project for the game, or remove the GameMode override and the plugin first. See <a href="documentation.html#quick-start">What the tool changes in your project</a>.</p>
+          </div>
+
+          <h3>Reading the data</h3>
           <div class="admonition warning">
             <p class="admonition-title">The images look almost black.</p>
             <p>Colour is stored in linear light, not sRGB. Apply an sRGB transfer function before display or training. Do not apply an inverse sRGB; that crushes the data.</p>
+          </div>
+          <div class="admonition warning">
+            <p class="admonition-title"><code>ExposureEV</code> differs between captures, but the images do not. Night images are very dark.</p>
+            <p>Every Color image is rendered at a fixed exposure of 1.0. <code>ExposureEV</code> only records what the exposure meter asked for, so two captures of the same pose can differ in <code>ExposureEV</code> while their images are the same. Night images come out dark for the same reason. That is expected; brighten them afterwards to look at them.</p>
           </div>
           <div class="admonition warning">
             <p class="admonition-title">Depth has huge values around 65504.</p>
@@ -73,12 +132,8 @@
             <p>Never bilinearly resample depth; use nearest-neighbour, so a discontinuity does not average into a surface that is not there.</p>
           </div>
           <div class="admonition warning">
-            <p class="admonition-title">Reflective surfaces (water, glass) look wrong or vary slice-to-slice.</p>
-            <p>Capture with Lumen hardware reflections; under screen-space reflection each 30&deg; slice reflects a different view. The manifest's <code>RenderParams</code> column records which mode was used.</p>
-          </div>
-          <div class="admonition warning">
             <p class="admonition-title">Two different alpha channels.</p>
-            <p><code>depth.A</code> is a translucency mask; <code>normal.A</code> is a validity mask. They mean different things and do not coincide.</p>
+            <p><code>depth.A</code> is a translucency mask (0 = a translucent surface came first); <code>normal.A</code> is a validity mask (0 = the sky, or an orientation that could not be measured). They mean different things and do not coincide. Because <code>normal.A == 0</code> covers more than the sky, take the sky mask from the depth (<code>depth &gt;= 65504</code>), not from the normal.</p>
           </div>
         </div>
 
@@ -88,8 +143,20 @@
           <p>Recent updates to the Urban360 documentation and project landing page.</p>
           
           <div style="border-left: 3px solid #2980B9; padding-left: 15px; margin-bottom: 25px;">
-            <h4 style="margin-bottom: 5px; color: #2980B9;">October 5, 2026</h4>
+            <h4 style="margin-bottom: 5px; color: #2980B9;">October 19, 2026</h4>
             <ul style="margin-top: 0; padding-left: 20px;">
+              <li><strong>Correction:</strong> Captures do not use Lumen. In Unreal Engine 5.7, scene captures run without Lumen global illumination and Lumen reflections, and the plugin never turned them back on, so every capture, including the data used in the paper, was rendered by the deferred renderer without bounced light. Earlier versions of this site described the rendering as Lumen-based. Dense GT on glass and water comes from the plugin's first-surface depth pass, and the reported results are unaffected.</li>
+              <li><strong>Landing Page:</strong> The rendering description and the reflection figure are corrected: the lower slice-frequency peak on water comes from turning screen-space reflection off, not from Lumen tracing. The plugin is now described as spline-based rather than as a single drop-in actor, and the contribution list no longer claims to be the first to export these modalities together.</li>
+              <li><strong>Landing Page and Documentation:</strong> The editor screenshots now show the current Capture Tool, its Env and Capture pages, and the Plugins browser.</li>
+              <li><strong>Documentation:</strong> Getting Started is rewritten for the current plugin: Windows 64-bit only, Niagara and Datasmith Content as dependencies, memory figures in place of a GPU recommendation, the extra restart for DBuffer decals, a Quick Start through the Capture Tool, and what the tool changes in a project.</li>
+              <li><strong>Documentation:</strong> Reference lists the settings by their names in the tool, with corrected defaults (Normal is off by default), the exposure settings marked as record only, and the Lighting Standard. It adds Semantic labels, the pixel-to-direction convention, the new manifest keys and a table for telling capture versions apart.</li>
+              <li><strong>Documentation:</strong> Support explains the problem codes and adds FAQs on resuming runs, dark shade, fixed exposure, points off the ground, labels, memory and packaging. The reflection FAQ now relies on the <code>ssr</code> key instead of recommending Lumen reflections.</li>
+            </ul>
+          </div>
+
+          <div style="border-left: 3px solid #999; padding-left: 15px; margin-bottom: 25px;">
+            <h4 style="margin-bottom: 5px; color: #666;">October 5, 2026</h4>
+            <ul style="margin-top: 0; padding-left: 20px; color: #555;">
               <li><strong>Landing Page:</strong> The Paper, Plugin Binary and Dataset buttons are now shown as disabled until release instead of linking nowhere.</li>
               <li><strong>Landing Page:</strong> References to CARLA, PanoCity (PanoVGGT), DAP and DA&sup2; now link to their arXiv pages instead of Google Scholar searches.</li>
               <li><strong>Documentation:</strong> The installation page now states that <code>Urban360.zip</code> is not publicly available yet and points to the early-access form below.</li>

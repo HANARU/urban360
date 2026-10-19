@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Urban360 Plugin - Getting Started</title>
-  
-  <link rel="stylesheet" href="assets/docs.css">
+
+  <link rel="stylesheet" href="assets/docs.css?v=20261019">
 </head>
 <body>
 
@@ -35,7 +35,7 @@
 
   <!-- Main Content (RTD Style) -->
   <main class="rtd-main" id="main-content">
-    
+
     <!-- Top Breadcrumb -->
     <header class="rtd-main-header">
       <div>
@@ -49,22 +49,28 @@
     <!-- Scrollable Content Area -->
     <div class="rtd-content-wrapper">
       <div class="rtd-content">
-        
+
         <h1>Getting Started</h1>
-        <p>Welcome to the official documentation for the Urban360 Unreal Engine 5 Plugin. This guide covers how to install the plugin and get up and running with generating FP16 panoramic synthetic data.</p>
+        <p>Welcome to the official documentation for the Urban360 Unreal Engine 5 Plugin. This guide covers how to install the plugin and capture your first panoramic data from a level of your own.</p>
 
         <!-- 1. Introduction & Requirements -->
         <div class="section-block" id="introduction">
           <h2>Introduction & Requirements</h2>
-          <p>The <strong>Urban360 Plugin</strong> is designed to bypass the complexity of manual camera setups and sequence rendering in Unreal Engine 5. By utilizing a single drop-in actor, it leverages hardware ray tracing (Lumen) to capture perfectly consistent 168-slice panoramic (Equirectangular) data, including RGB, continuous Depth, Surface Normal, and Camera Pose.</p>
-          
+          <p>The <strong>Urban360 Plugin</strong> is an editor plugin that captures 360&deg; panoramic datasets from your own Unreal Engine 5 levels, without manual camera setups or sequence rendering. You draw a road spline, generate capture points along it, and press Play. At every point the plugin renders 168 slices through SceneCapture, each 40&deg; wide and placed every 15&deg; horizontally and 30&deg; vertically (24 &times; 7), and stitches them into equirectangular (ERP) images: Color, continuous Depth and Surface Normal as FP16 EXR files, and optionally Semantic labels as a PNG. The camera pose of every image goes into a manifest CSV.</p>
+          <p>Every capture is lit by the plugin's <strong>Lighting Standard</strong> instead of the level's own sun, sky light, sky and fog, so that different worlds are shot under the same light. The time of day and the weather are chosen in the tool. See <a href="documentation_reference.html#configuration">Configuration Parameters</a>.</p>
+
+          <div class="admonition note">
+            <p class="admonition-title">Rendering: captures do not use Lumen</p>
+            <p>The slices are rendered by UE5's deferred renderer. In Unreal Engine 5.7, scene captures run without Lumen global illumination and Lumen reflections unless a capture turns them back on, and the plugin does not. A capture therefore contains no bounced light, and its reflections come from reflection captures and the sky light. Dense Depth and Normal on glass and water do not depend on lighting: the plugin records the first surface the camera meets in a separate depth pass. Earlier versions of this documentation described the rendering as Lumen-based, which was wrong.</p>
+          </div>
+
           <div class="admonition note">
             <p class="admonition-title">System Requirements</p>
             <ul>
-              <li><strong>Engine:</strong> Unreal Engine 5.7 only.</li>
-              <li><strong>GPU:</strong> A DirectX 12 GPU with hardware ray tracing (Lumen HWRT is used for reflections). Any GPU that runs the engine can capture RGB/Depth/Normal; the climate and weather VFX are GPU-bound, so an RTX 3060 or better is recommended when those are enabled.</li>
-              <li><strong>Project:</strong> Any Unreal Engine 5.7 project, including Blueprint-only ones. The plugin ships compiled, so no C++ toolchain and no build step are required.</li>
-              <li><strong>Required plugins:</strong> Niagara (weather VFX) and Editor Scripting Utilities are enabled as dependencies.</li>
+              <li><strong>Engine and platform:</strong> Unreal Engine 5.7 on Windows 64-bit only; the plugin ships compiled for this combination. It has been verified with UE 5.7.4. Linux and Mac have not been tested.</li>
+              <li><strong>Memory:</strong> No particular GPU model has been benchmarked; in practice the limit is memory. The images of one capture point take about 1 GB in stereo at a Resolution of 1024, 5 GB at 2048 and 18 GB at 4096 (mono about two thirds of that), and playing a large level often takes 10 GB or more on top of that. Above 2048, Setup &amp; Verify shows the estimate next to the memory the PC has free.</li>
+              <li><strong>Project:</strong> Any Unreal Engine 5.7 project, Blueprint-only or C++. The plugin ships compiled, so it loads without a C++ toolchain or a build step.</li>
+              <li><strong>Required plugins:</strong> Niagara (weather effects) and Datasmith Content. Both are enabled by default in the engine.</li>
             </ul>
           </div>
         </div>
@@ -75,36 +81,54 @@
           <p>Urban360 is distributed as a compiled plugin, so there is no build step and it drops into an existing project as it is.</p>
           <div class="admonition warning">
             <p class="admonition-title">Not yet publicly released</p>
-            <p>The plugin binary will be published together with the paper, so <code>Urban360.zip</code> is not available for download yet. To try it before then, request early access through the <a href="documentation_support.html#contact">contact form</a>. The steps below describe the installation once you have the archive.</p>
+            <p>The plugin archive (<code>Urban360_&lt;version&gt;_UE5.7_Win64.zip</code>) will be published together with the paper and is not available for download yet. To try it before then, request early access through the <a href="documentation_support.html#contact">contact form</a>. The steps below describe the installation once you have the archive.</p>
           </div>
           <ol>
-            <li>Obtain <code>Urban360.zip</code> (from the public release, or from the authors if you were granted early access).</li>
-            <li>Create a <code>Plugins</code> folder at the root of your project. Unreal does not create this folder for you, so it will normally not be there yet.</li>
-            <li>Extract the archive so that the plugin folder (<code>Sim2RealDataGen</code>) sits directly under <code>&lt;YourProject&gt;/Plugins/</code>.</li>
-            <li>Open the project, go to <strong>Edit &gt; Plugins</strong>, search for <em>Urban360</em>, enable it, and restart the editor when prompted. The plugin is then ready to use.</li>
+            <li>Obtain the archive, from the public release or from the authors if you were granted early access.</li>
+            <li>Create a <code>Plugins</code> folder at the root of your project if there is none yet. Unreal does not create it for you.</li>
+            <li>Extract the archive so that the whole plugin folder, including its <code>Content</code> folder, sits at <code>&lt;YourProject&gt;/Plugins/Sim2RealDataGen/</code>.</li>
+            <li>Open the project, go to <strong>Edit &gt; Plugins</strong>, search for <em>Urban360</em>, enable it if it is not already on, and restart the editor.</li>
+            <li>On its first load the plugin turns on DBuffer decals (<em>Project Settings &gt; Rendering</em>), which the rain and snow decals need, and asks for one more restart.</li>
+            <li>Open the capture tool with the <strong>Urban360</strong> button on the toolbar, next to Play.</li>
           </ol>
           <div style="text-align: center; margin: 24px 0;">
-            <img loading="lazy" src="assets/plugin_enabled.jpg" alt="The Unreal Editor Plugins browser with Urban360 listed under Project, Other, at version 1.0 with its checkbox ticked, and the Dataset Generator panel open on the right" style="max-width: 100%; border: 1px solid #e1e4e5; border-radius: 3px;">
-            <p style="font-size: 0.9em; color: #737373; margin-top: 8px;">Once enabled, Urban360 appears under <em>Project &gt; Other</em> in the Plugins browser and the Dataset Generator panel becomes available.</p>
+            <img loading="lazy" src="assets/plugin_enabled.jpg" alt="The Unreal Editor Plugins browser filtered to Urban360, which is listed under Project, Simulation at version 1.0 with its checkbox ticked" style="max-width: 100%; border: 1px solid #e1e4e5; border-radius: 3px;">
+            <p style="font-size: 0.9em; color: #737373; margin-top: 8px;">Once enabled, Urban360 appears under <em>Project &gt; Simulation</em> in the Plugins browser.</p>
           </div>
           <div class="admonition note">
             <p class="admonition-title">Binary distribution</p>
-            <p>The plugin is released as a compiled binary and its source code is not published. Because a compiled Unreal plugin is tied to the engine build it was made with, this is also why Unreal Engine 5.7 is required rather than merely recommended. Blueprint-only projects are supported, since nothing has to be compiled on your side.</p>
+            <p>The plugin is released as a compiled binary for Unreal Engine 5.7 on Windows 64-bit, and its source code is not published. A compiled Unreal plugin is tied to the engine version it was built for, which is why 5.7 is required rather than merely recommended. Blueprint-only projects are supported, since nothing has to be compiled on your side.</p>
           </div>
         </div>
 
         <!-- 3. Quick Start -->
         <div class="section-block" id="quick-start">
           <h2>Quick Start</h2>
-          <p>Generating a panoramic dataset is designed to be a straightforward drag-and-drop operation:</p>
+          <p>All capture work is set up in the <strong>Capture Tool</strong>, whose panel is titled <em>Dataset Generator</em>. It has three pages (Env, Points and Capture), and at the bottom a status line with <strong>Apply Settings</strong> and <strong>Setup &amp; Verify</strong>, which stay visible on every page. The capture itself starts from the editor's own <strong>Play</strong> button. The <strong>?</strong> buttons in the tool explain every field.</p>
           <ol>
-            <li>Open the Urban360 tool window and place a <strong>Road Spline</strong> to define the capture path; Capture Points are generated along it.</li>
-            <li>Set the capture options in <strong>Project Settings &gt; Plugins &gt; Urban360</strong> (Resolution, Capture Type, Capture Height, output path, and so on).</li>
-            <li>Run the capture. The plugin renders 168 slices per view, stitches them through the GeoLUT, and writes the EXR files and the manifest to the output directory.</li>
+            <li><strong>Points page: lay out the capture points.</strong> Place a <strong>Road Spline</strong> along the route you want covered and press <strong>Generate Points</strong>. Points are laid every Spline Spacing (500 cm by default) across the spline's Road Width (1000 cm, set per spline), and a point with a wall or tree within the Safety Radius (35 cm) is dropped. Generate Points uses the values in the fields at that moment, without Apply Settings, and numbers the new points from the Start Index on the Env page. A point marks a spot on the ground, and the camera stands Camera Height above it. Each point's SceneID becomes the name of its output folder; <strong>Renumber</strong> renumbers the selected points, or the whole level when nothing is selected, after asking first.</li>
+            <li><strong>Capture page: choose what to write.</strong> Pick Capture Stereo (Stereo or Mono), the image types under Capture Mode (RGB, Depth, Normal, Semantic; All ticks every one), Capture Count (Single, one image per point, or Group, nine), Camera Height (160 cm) and, for Group, Local Step (10 cm). With a point selected, the page also shows its <strong>Capture Target</strong> box: a point is shot only while the box is ticked. Target All and Skip All on the Points page set every box at once.</li>
+            <li><strong>Env page: set the output and the conditions.</strong> Under Output Setup, set Env Name (the name of the output folder), Start Index, the output folder (Browse Path) and Resolution. Under Climate, choose the time of day (Day or Night) and the weather (None, Rain, Snow or Fog). Then press <strong>Apply Settings</strong>. It saves the values of all three pages at once and applies the time of day, the weather and the calibration to the level. The button turns yellow while there are changes that have not been applied, and Setup &amp; Verify does not pass until they are.</li>
+            <li><strong>Setup &amp; Verify.</strong> When everything is in order, the button turns green and reads <em>Verified</em> for two seconds, and anything worth knowing appears as a notification at the bottom right of the editor. When something must be fixed, a window lists the problems, each with a code such as <code>S007</code>; see <a href="documentation_support.html#troubleshooting">Troubleshooting &amp; FAQs</a>. This step also sets the level's GameMode to the capture GameMode, and offers to put points that are off the ground back onto it.</li>
+            <li><strong>Play.</strong> Press Play on the editor toolbar. The run captures every point whose Capture Target box is ticked, from Start Index on, and ends Play by itself. It writes a run report (<code>_run_&lt;date&gt;-&lt;time&gt;.txt</code>) next to the scene folders. The capture does not change any Capture Target box, so pressing Play again shoots the same points again.</li>
           </ol>
           <div style="text-align: center; margin: 24px 0;">
-            <img loading="lazy" src="assets/plugin_quickstart.png" alt="The Urban360 page in Unreal's Project Settings, listing the Climate, Config, Generation, Capture and Exposure sections with capture type, per-modality toggles, capture count, capture height, grid distance and output resolution" style="max-width: 100%; border: 1px solid #e1e4e5; border-radius: 3px;">
-            <p style="font-size: 0.9em; color: #737373; margin-top: 8px;">Capture options live in <em>Project Settings &gt; Plugins &gt; Urban360</em>: the capture type, which modalities to write, the capture count, the camera height, the grid distance and the output resolution. The values above are an example, not the defaults.</p>
+            <img loading="lazy" src="assets/plugin_quickstart.png" alt="The Env page of the Urban360 Capture Tool after Apply Settings: Output Setup with Env Name Day_Clear, Start Index 1, an output folder and Resolution 1024, then Climate with Day and no weather, and at the bottom the status line, a greyed-out Apply Settings button and Setup and Verify" style="width: 400px; max-width: 100%; border: 1px solid #e1e4e5; border-radius: 3px;">
+            <p style="font-size: 0.9em; color: #737373; margin-top: 8px;">The Env page after Apply Settings: Output Setup and Climate, with the status line, Apply Settings and Setup &amp; Verify at the bottom. Apply Settings is greyed out because nothing is waiting to be applied.</p>
+          </div>
+
+          <div class="admonition note">
+            <p class="admonition-title">What the tool changes in your project</p>
+            <p>The capture tool sets up the project it is used in. These changes are intended and stay in place:</p>
+            <ul>
+              <li>DBuffer decals are turned on (<em>Project Settings &gt; Rendering</em>) the first time the plugin loads.</li>
+              <li>Setup &amp; Verify sets the level's GameMode to the capture GameMode (<em>World Settings &gt; GameMode Override</em>). That is what makes Play capture instead of play.</li>
+            </ul>
+            <p>While the tool's climate system is active, the level's own sun, sky light, sky and fog are hidden in the viewport and in the capture, and the Lighting Standard lights the scene instead. Nothing about this is saved into the level. While a capture runs, the tool also turns off texture streaming, holds the editor at 30 fps and turns off the editor's background CPU throttling. All of these are put back when Play ends.</p>
+          </div>
+          <div class="admonition warning">
+            <p class="admonition-title">Do not package a capture project as a game</p>
+            <p>A project set up this way is a capture workspace, not a game. The capture classes live in an editor-only module and are not packaged, so a level whose GameMode is the capture GameMode cannot run in a packaged build. If you also need to ship the game, use a separate copy of the project, or remove the GameMode override and the plugin first.</p>
           </div>
         </div>
 
