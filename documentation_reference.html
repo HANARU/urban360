@@ -96,7 +96,7 @@
               <tr>
                 <td><strong>Capture Stereo</strong> (Capture Type)</td>
                 <td><code>Stereo</code></td>
-                <td>Stereo writes both eyes into one file. Mono writes one eye from the rig centre and takes about half the time.</td>
+                <td>Stereo writes both eyes into one file. Mono writes one eye from the rig center and takes about half the time.</td>
               </tr>
               <tr>
                 <td><strong>Capture Count</strong></td>
@@ -169,7 +169,7 @@
               <tr>
                 <td><strong>Use Level Post Process</strong></td>
                 <td><code>Off</code></td>
-                <td>On lets the level's PostProcessVolume grade the Color images (colour temperature, saturation, contrast, curves). Off gives every world the same grading.</td>
+                <td>On lets the level's PostProcessVolume grade the Color images (color temperature, saturation, contrast, curves). Off gives every world the same grading.</td>
               </tr>
               <tr>
                 <td><strong>Weather Fog Scale</strong></td>
@@ -209,11 +209,11 @@
           </div>
           <div class="admonition note">
             <p class="admonition-title">Stereo baseline</p>
-            <p>The stereo baseline is fixed at 6.4 cm (&plusmn;3.2 cm per eye) through the <code>DG.EyeSeparation</code> console variable; it is not a field in the tool. Mono renders from the rig centre, and <code>StitchParams</code> records <code>eyesep</code> (0 for Mono). Mono captures made before 12 October 2026 have no <code>eyesep</code> and were rendered 3.2 cm to the left of the recorded position.</p>
+            <p>The stereo baseline is fixed at 6.4 cm (&plusmn;3.2 cm per eye) through the <code>DG.EyeSeparation</code> console variable; it is not a field in the tool. Mono renders from the rig center, and <code>StitchParams</code> records <code>eyesep</code> (0 for Mono). Mono captures made before 12 October 2026 have no <code>eyesep</code> and were rendered 3.2 cm to the left of the recorded position.</p>
           </div>
           <div class="admonition note">
             <p class="admonition-title">Semantic labels</p>
-            <p>With Semantic on, the plugin writes an 8-bit RGB PNG in which the colour of a pixel is its category; the category number itself is not stored. The default category table is based on Cityscapes and is not final, so it is not listed here. Labels are set up for each level, by assigning categories to actors, by mesh-path rules, by actor-class mappings and by landscape paint layers. Setup &amp; Verify does not pass while objects the camera can see have no label. MASS crowds and traffic exist only during the capture, so this check cannot see them.</p>
+            <p>With Semantic on, the plugin writes an 8-bit RGB PNG in which the color of a pixel is its category; the category number itself is not stored. The default category table is based on Cityscapes and is not final, so it is not listed here. Labels are set up for each level, by assigning categories to actors, by mesh-path rules, by actor-class mappings and by landscape paint layers. Setup &amp; Verify does not pass while objects the camera can see have no label. MASS crowds and traffic exist only during the capture, so this check cannot see them.</p>
           </div>
         </div>
 
@@ -223,13 +223,13 @@
           <p>For every capture position the plugin writes the files below into the scene folder and one row into the scene's manifest. The EXR files are W &times; W, HALF float, ZIP-compressed, RGBA, one file per image type rather than one multi-channel file. Stereo stacks the two eyes in every image file (left on top, right on bottom), so each eye is a W &times; W/2 equirectangular image.</p>
           <ul>
             <li><strong>Color</strong> (<code>&lt;SceneID&gt;_pos5_color.exr</code>): ACES-tonemapped LDR in linear light (no sRGB gamma), range [0, 1], alpha = 1. The exposure is fixed at 1.0 whatever <code>ExposureEV</code> says, so pixel values compare directly across points, scenes and conditions. Rendered without Lumen, so there is no bounced light. Apply an sRGB transfer before display or before feeding sRGB-trained backbones.</li>
-            <li><strong>Depth</strong> (<code>&lt;SceneID&gt;_pos5_depth.exr</code>): R = G = B = radial distance (metres) to the first surface the ray meets. Sky = 65504.0, invalid = 0.0 (use <code>valid = depth &lt; 65504.0</code>). Alpha = translucency mask (1 = opaque, 0 = a translucent surface came first). A translucent material that writes its own depth (<em>Output Depth and Velocity</em>) stays at A = 1; its distance is still correct.</li>
+            <li><strong>Depth</strong> (<code>&lt;SceneID&gt;_pos5_depth.exr</code>): R = G = B = radial distance (meters) to the first surface the ray meets. Sky = 65504.0, invalid = 0.0 (use <code>valid = depth &lt; 65504.0</code>). Alpha = translucency mask (1 = opaque, 0 = a translucent surface came first). A translucent material that writes its own depth (<em>Output Depth and Velocity</em>) stays at A = 1; its distance is still correct.</li>
             <li><strong>Normal</strong> (<code>&lt;SceneID&gt;_pos5_normal.exr</code>): RGB = unit surface normal in CV coordinates, derived from the depth. Alpha = validity mask (1 = valid, 0 = invalid). Invalid pixels are the sky and pixels whose orientation could not be measured, written as RGB (0, 0, 0), so <code>normal.A == 0</code> is a larger set than <code>depth &gt;= 65504</code>. Normals near the zenith and the nadir are measured like everywhere else.</li>
-            <li><strong>Semantic</strong> (<code>&lt;SceneID&gt;_pos5_semantic.png</code>, optional): 8-bit RGB, one colour per category, with the eyes stacked like the EXR files.</li>
+            <li><strong>Semantic</strong> (<code>&lt;SceneID&gt;_pos5_semantic.png</code>, optional): 8-bit RGB, one color per category, with the eyes stacked like the EXR files.</li>
             <li><strong>Depth behind translucency</strong> (<code>&lt;SceneID&gt;_pos5_depth_behind.exr</code>, optional): written only when the console variable <code>DG.Depth.WriteBehindLayer</code> is 1. It records the opaque surface behind glass and water, for work on multi-layer depth.</li>
             <li><strong>Pixel to direction:</strong> pixel-corner convention. In an eye image of width W and height H = W/2, pixel (x, y) looks along longitude &theta; = x / W &middot; 360&deg; and polar angle &phi; = y / H &middot; 180&deg;. Row 0 is exactly the zenith and the last row is half a pixel above the nadir; column 0 faces the rig's forward direction, and the view turns right as the column grows. Reading with the common (x + 0.5) / W convention shifts every direction by half a pixel (0.18&deg; at W = 1024).</li>
-            <li><strong>Coordinate frame:</strong> CV standard (X-right, Y-down, Z-forward), metres.</li>
-            <li><strong>Camera Pose:</strong> <code>&lt;SceneID&gt;_manifest.csv</code>, one row per completed position, columns: <code>Filename, PosX, PosY, PosZ, Qw, Qx, Qy, Qz, ExposureEV, DepthConvention, TranslucentElements, TranslucentPct, StitchParams, RenderParams</code>. Position in metres, unit quaternion in WXYZ order with <code>Qw &ge; 0</code>, CV frame. Pose is not stored in the EXR and not in a <code>metadata.json</code>. <code>ExposureEV</code> is what the exposure meter asked for, not what was applied.</li>
+            <li><strong>Coordinate frame:</strong> CV standard (X-right, Y-down, Z-forward), meters.</li>
+            <li><strong>Camera Pose:</strong> <code>&lt;SceneID&gt;_manifest.csv</code>, one row per completed position, columns: <code>Filename, PosX, PosY, PosZ, Qw, Qx, Qy, Qz, ExposureEV, DepthConvention, TranslucentElements, TranslucentPct, StitchParams, RenderParams</code>. Position in meters, unit quaternion in WXYZ order with <code>Qw &ge; 0</code>, CV frame. Pose is not stored in the EXR and not in a <code>metadata.json</code>. <code>ExposureEV</code> is what the exposure meter asked for, not what was applied.</li>
           </ul>
           <p>A position that stalled or whose files could not all be written gets no row, and a row from an earlier run of the same position is dropped with it. Files in a scene folder without a manifest row are therefore incomplete. Images and manifests are written to a <code>.part</code> file first and renamed when complete, so a file under its final name is never cut short.</p>
           <pre><code>&lt;Current Path&gt;/&lt;Env Name&gt;/
@@ -249,8 +249,8 @@
               <tr><td><code>h</code>, <code>v</code></td><td>StitchParams. Horizontal and vertical step between slices, in degrees (15 and 30).</td></tr>
               <tr><td><code>fov</code></td><td>StitchParams. Field of view each slice was rendered at, in degrees (40). <code>30.0</code> marks a capture made before October 2026, with the stitching defects listed below.</td></tr>
               <tr><td><code>ov</code>, <code>blendh</code>, <code>blendv</code>, <code>guardh</code>, <code>guardv</code></td><td>StitchParams. Requested blend width, the horizontal and vertical blend widths actually applied, and the guard added to each strip, in degrees.</td></tr>
-              <tr><td><code>tau</code>, <code>w</code>, <code>ss</code></td><td>StitchParams. Edge threshold of the depth stitching, Resolution, and whether Color averages over each pixel's area (1) or samples its centre (0).</td></tr>
-              <tr><td><code>eyesep</code></td><td>StitchParams. Distance between the eyes in cm; 0 for Mono, which renders from the rig centre.</td></tr>
+              <tr><td><code>tau</code>, <code>w</code>, <code>ss</code></td><td>StitchParams. Edge threshold of the depth stitching, Resolution, and whether Color averages over each pixel's area (1) or samples its center (0).</td></tr>
+              <tr><td><code>eyesep</code></td><td>StitchParams. Distance between the eyes in cm; 0 for Mono, which renders from the rig center.</td></tr>
               <tr><td><code>refl</code></td><td>RenderParams. The project's reflection method. This is a project setting only; it does not mean Lumen reflections ran.</td></tr>
               <tr><td><code>lumenfront</code></td><td>RenderParams. Whether the plugin switched on Lumen front-layer reflections for the capture, which it does when the project's reflection method is Lumen. It has no effect, because Lumen does not run in scene captures.</td></tr>
               <tr><td><code>ssr</code></td><td>RenderParams. Whether screen-space reflection was on. With 1, reflections on water and glass can differ from slice to slice; this key, not <code>refl</code>, says whether reflective pixels carry that artefact.</td></tr>
@@ -276,7 +276,7 @@
               <tr><td>No <code>dfao</code>, or <code>dfao=1</code>, in RenderParams</td><td>Surfaces the sun does not reach receive no sky light, so shade can be near black, and rain, snow and fog keep sharp sun shadows with black interiors.</td></tr>
               <tr><td>Captured before 10 October 2026</td><td>Normals that could not be measured are marked valid (a vertical normal with A = 1), and the quaternion sign varies (flip all four components where <code>Qw &lt; 0</code>).</td></tr>
               <tr><td>No <code>eyesep</code> in StitchParams</td><td>Mono was rendered 3.2 cm to the left of the recorded position, and normals within 8.6&deg; of the zenith and nadir were blended toward vertical.</td></tr>
-              <tr><td>Night capture in Rain, Snow or Fog made before 12 October 2026 (no manifest key; a row without <code>sun</code> in RenderParams is older still)</td><td>The sky dome kept its daytime colours, a blue-orange sky with a bright sun disc above a night scene, and the shade was lit more than the Night Lighting standard says. Do not use these as night data.</td></tr>
+              <tr><td>Night capture in Rain, Snow or Fog made before 12 October 2026 (no manifest key; a row without <code>sun</code> in RenderParams is older still)</td><td>The sky dome kept its daytime colors, a blue-orange sky with a bright sun disc above a night scene, and the shade was lit more than the Night Lighting standard says. Do not use these as night data.</td></tr>
             </tbody>
           </table>
 

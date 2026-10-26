@@ -38,21 +38,21 @@
       'Time of Day and Weather only stage a choice. The level changes when you press Apply Settings.',
       'Level Sky & Lights lists the level\u2019s own sky and light actors that the capture hides, so every world is shot under the plugin\u2019s lighting.']],
     points: ['Points page', [
-      'Place Road Spline adds a spline that you draw along a street. Generate Points lays capture points along it every Spline Spacing centimetres and puts them on the ground.',
+      'Place Road Spline adds a spline that you draw along a street. Generate Points lays capture points along it every Spline Spacing centimeters and puts them on the ground.',
       'Each point has a Capture Target box. A run captures the ticked points and never changes the boxes. Target All and Skip All set them all.',
       'Renumber IDs renumbers the selected points, or the whole level, after asking first.']],
     capture: ['Capture page', [
-      'Capture Stereo records a left and a right eye 6.4 cm apart. Mono records one panorama from the rig centre.',
+      'Capture Stereo records a left and a right eye 6.4 cm apart. Mono records one panorama from the rig center.',
       'Capture Mode selects the outputs: RGB (Color), Depth, Normal and Semantic.',
-      'Group (9) captures nine positions around each point, Local Step apart. Single (1) captures the centre only.',
+      'Group (9) captures nine positions around each point, Local Step apart. Single (1) captures the center only.',
       'Semantic Option opens the window where actors are given categories.']],
   };
 
-  const DEMO_ONLY = {
-    spline: 'In the editor this adds a road spline to draw along a street. The demo uses a level that already has its points.',
+  const EDITOR_ONLY = {
+    spline: 'In the editor this adds a road spline to draw along a street. The simulator uses a level that already has its points.',
     estimate: 'In the editor this estimates how many points the splines will give. The DTW level has 803.',
-    clear: 'In the editor this removes the generated points. The demo keeps its one point.',
-    generate: 'In the editor this lays points along every road spline. The demo uses one of them, 000742.',
+    clear: 'In the editor this removes the generated points. The simulator keeps its one point.',
+    generate: 'In the editor this lays points along every road spline. The simulator uses one of them, 000742.',
     anchors: 'In the editor this writes the point positions to a file.',
   };
 
@@ -299,7 +299,7 @@
     if (isFile) {
       $('#fileImg').src = `assets/simulator/pano/color_${captured.weather}_stereo.jpg`;
       $('#fileCap').innerHTML = captured.stereo === 'Mono'
-        ? 'Mono writes one panorama, W &times; W/2, from the rig centre. The demo data is stereo, shown here as written.'
+        ? 'Mono writes one panorama, W &times; W/2, from the rig center. The captures in this simulator are stereo, shown here as written.'
         : `${NODE}_pos5_color.exr is one W &times; W image (here 1024 &times; 1024): the left eye on top, the right eye below, each a 2:1 panorama.`;
     } else {
       viewer.setMode(view);
@@ -344,7 +344,7 @@
       val = cm === 65535 ? 'Sky: no surface (stored as 65504)' : cm === 65534 ? 'Depth > 655 m' : `Depth ${(cm / 100).toFixed(2)} m`;
     } else if (channel === 'semantic') {
       const c = sample('semantic', hit.u, hit.v), cat = CAT_BY_RGB.get((c[0] << 16) | (c[1] << 8) | c[2]);
-      val = cat ? `${cat.name} (ID ${cat.id})` : `Colour ${c.join(', ')}`;
+      val = cat ? `${cat.name} (ID ${cat.id})` : `Color ${c.join(', ')}`;
     } else if (channel === 'normal') {
       const c = sample('normal', hit.u, hit.v);
       val = c[0] + c[1] + c[2] === 0 ? 'No valid normal (A = 0)'
@@ -418,13 +418,13 @@
       files.map(([n, s, d]) => `<li class="file l3"><span class="fn">${n}</span><span class="fs">${fmtSize(s)}</span><span class="fd">${d}</span></li>`).join('') +
       `<li class="file l2"><span class="fn">_run_${stamp}.txt</span><span class="fs"></span><span class="fd">run report: machine, time, problem codes</span></li>`;
     $('#treeNote').textContent = (c.count === 'group'
-      ? 'Group (9) writes the same files for pos1 to pos9 and nine manifest rows; the demo has pos5, the centre. '
+      ? 'Group (9) writes the same files for pos1 to pos9 and nine manifest rows; the simulator has pos5, the center. '
       : '') + (c.stereo === 'Mono' ? 'Mono files hold one panorama instead of two eyes. ' : '') +
       'Sizes are those of the real files of this point.';
 
     const row = manifestRow(c.weather);
     const NOTES = {
-      Filename: 'shared by all files of this position', PosX: 'metres', PosY: 'metres', PosZ: 'metres',
+      Filename: 'shared by all files of this position', PosX: 'meters', PosY: 'meters', PosZ: 'meters',
       Qw: 'unit quaternion (Qw \u2265 0)', ExposureEV: 'meter reading; images use a fixed exposure',
       DepthConvention: 'first surface the camera meets', TranslucentElements: 'materials made opaque for the depth pass',
       TranslucentPct: '% of pixels whose first surface is translucent',
@@ -473,7 +473,7 @@
       const pl = $('#pointList'); pl.hidden = !pl.hidden;
       e.target.textContent = pl.hidden ? 'Open Point List' : 'Close Point List';
     });
-    $$('[data-demo-only]').forEach((b) => b.addEventListener('click', () => toast(DEMO_ONLY[b.dataset.demoOnly])));
+    $$('[data-editor-only]').forEach((b) => b.addEventListener('click', () => toast(EDITOR_ONLY[b.dataset.editorOnly])));
 
     $('#btnBrowse').addEventListener('click', () => toast('In the editor this opens a folder picker. Type a path in Current Path to try it here.'));
     $('#btnRefresh').addEventListener('click', () => { refresh(); toast(`Read from the level: ${condLabel(applied)}. Reading never changes the level.`); });
@@ -498,10 +498,10 @@
     $('#btnSemantic').addEventListener('click', () => openDialog('Semantic window',
       '<img class="dlg-img" src="assets/simulator/editor/semantic_window.png" alt="The Semantic window of the plugin with the Road group of DTW">' +
       '<ol><li>Select actors in the level, or from the list that <b>Open Outliner</b> shows.</li>' +
-      '<li>Choose a category in the drop-down list and press <b>Add to Group</b>. Each category becomes a group with its colour, ID and actors.</li>' +
+      '<li>Choose a category in the drop-down list and press <b>Add to Group</b>. Each category becomes a group with its color, ID and actors.</li>' +
       '<li><b>Find</b> selects an actor in the level; <b>Delete</b> takes it out of the group. <b>Clean Selected</b> and <b>Clean All</b> remove assignments in bulk.</li>' +
       '<li><b>Custom Categories</b> edits the category table. Tick Semantic under Capture Mode to record it.</li></ol>' +
-      '<p class="dlg-note">Label rules for meshes and landscape layers are set in Project Settings &gt; Plugins &gt; Urban360 &gt; Semantic. The demo point is already labelled.</p>'));
+      '<p class="dlg-note">Label rules for meshes and landscape layers are set in Project Settings &gt; Plugins &gt; Urban360 &gt; Semantic. The point in this simulator is already labeled.</p>'));
     $('#btnExr').addEventListener('click', () => {
       if (!captured) { toast('Nothing captured yet. Press Play first.'); return; }
       vpMode = 'output'; updateViewport(true);

@@ -11,7 +11,7 @@
   <meta property="og:description" content="Walk through one Urban360 capture in the browser and inspect its Color, Depth, Normal and Semantic outputs.">
   <meta property="og:image" content="https://hanaru.github.io/urban360/assets/Thumbnail.jpg">
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans:400,700" rel="stylesheet">
-  <link rel="stylesheet" href="assets/simulator/simulator.css?v=20261026">
+  <link rel="stylesheet" href="assets/simulator/simulator.css?v=20261026b">
 </head>
 <body>
 
@@ -57,7 +57,7 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" fill="currentColor"/></svg>
         </button>
         <span class="tb-title">DownTownWest_Train &middot; Demo_Environment</span>
-        <button type="button" class="tb-reset" id="btnReset" title="Start the demo again">Reset demo</button>
+        <button type="button" class="tb-reset" id="btnReset" title="Start the simulator again">Reset simulator</button>
       </div>
 
       <div class="app-body">
@@ -83,7 +83,7 @@
             <canvas id="pano" aria-label="360 degree view of the capture point"></canvas>
             <div class="file-view" id="fileView" hidden>
               <div class="file-img">
-                <img id="fileImg" alt="Colour file of the capture: left eye on top, right eye below">
+                <img id="fileImg" alt="Color file of the capture: left eye on top, right eye below">
                 <span class="eye eye-l">Left eye</span><span class="eye eye-r">Right eye</span>
               </div>
               <p class="file-cap" id="fileCap"></p>
@@ -118,12 +118,12 @@
               <div class="row"><label for="envName">Env Name</label><input id="envName" type="text" spellcheck="false" autocomplete="off"></div>
               <div class="row"><label for="startIndex">Start Index</label><input id="startIndex" type="number" min="1" step="1"></div>
               <div class="row"><label for="rootPath">Current Path</label><input id="rootPath" type="text" spellcheck="false" autocomplete="off"></div>
-              <div class="row"><label for="resolution">Resolution</label><input id="resolution" type="text" value="1024" readonly title="Fixed in this demo: the sample point was captured at 1024"></div>
+              <div class="row"><label for="resolution">Resolution</label><input id="resolution" type="text" value="1024" readonly title="Fixed in this simulator: the sample point was captured at 1024"></div>
               <button type="button" class="btn wide" id="btnBrowse">Browse Path</button>
 
               <div class="sec-head"><h3>Climate</h3></div>
               <div class="row light"><label for="tod">Time of Day</label>
-                <select id="tod"><option value="day">Day</option><option value="night" disabled>Night (not in this demo)</option></select></div>
+                <select id="tod"><option value="day">Day</option><option value="night" disabled>Night (not in this simulator)</option></select></div>
               <div class="row light"><label for="weather">Weather</label>
                 <select id="weather"><option value="none">None</option><option value="rain">Rain</option><option value="snow">Snow</option><option value="fog">Fog</option></select></div>
               <button type="button" class="btn wide" id="btnRefresh">Refresh</button>
@@ -138,15 +138,15 @@
             <!-- Points -->
             <div class="tool-page" data-page="points" hidden>
               <div class="sec-head"><h3>Point Generation</h3><button type="button" class="help" data-help="points">?</button></div>
-              <button type="button" class="btn wide" data-demo-only="spline">Place Road Spline</button>
+              <button type="button" class="btn wide" data-editor-only="spline">Place Road Spline</button>
               <div class="row"><label>Spline Spacing</label><input type="text" value="500" readonly><span class="unit">cm</span></div>
               <div class="row"><label>Safety Radius</label><input type="text" value="35" readonly></div>
               <div class="row"><label>Road Width</label><input type="text" value="0" readonly class="dim"></div>
-              <div class="btn-pair"><button type="button" class="btn" data-demo-only="estimate">Check Estimate</button><span class="ready">Ready</span></div>
-              <button type="button" class="btn wide" data-demo-only="clear">Clear All</button>
-              <button type="button" class="btn wide" data-demo-only="generate">Generate Points</button>
+              <div class="btn-pair"><button type="button" class="btn" data-editor-only="estimate">Check Estimate</button><span class="ready">Ready</span></div>
+              <button type="button" class="btn wide" data-editor-only="clear">Clear All</button>
+              <button type="button" class="btn wide" data-editor-only="generate">Generate Points</button>
               <div class="btn-pair"><button type="button" class="btn" id="btnTargetAll">Target All</button><button type="button" class="btn" id="btnSkipAll">Skip All</button></div>
-              <button type="button" class="btn wide" data-demo-only="anchors">Export Anchors</button>
+              <button type="button" class="btn wide" data-editor-only="anchors">Export Anchors</button>
               <p class="next-play" id="nextPlay"></p>
               <button type="button" class="btn wide" id="btnPointList">Open Point List</button>
               <div class="point-list" id="pointList" hidden>
@@ -154,7 +154,7 @@
               </div>
               <figure class="tool-fig">
                 <img src="assets/simulator/editor/points_viewport.jpg" alt="Capture points laid along a street of the DTW level in the editor viewport" loading="lazy">
-                <figcaption>In the editor, points are laid along the road (803 in this level). The demo captures one of them, 000742.</figcaption>
+                <figcaption>In the editor, points are laid along the road (803 in this level). The simulator captures one of them, 000742.</figcaption>
               </figure>
             </div>
 
@@ -206,7 +206,7 @@
       </div>
       <div class="out-col">
         <h2>Manifest</h2>
-        <p class="note">One row per capture position. Position is in metres and rotation is a unit quaternion, both in the
+        <p class="note">One row per capture position. Position is in meters and rotation is a unit quaternion, both in the
           computer-vision camera convention.</p>
         <table class="mf" id="manifest"></table>
         <details class="raw"><summary>Raw CSV</summary><pre id="manifestRaw"></pre></details>
@@ -229,13 +229,13 @@
   </section>
 
   <section class="wrap block notes">
-    <h2>About this demo</h2>
+    <h2>About this simulator</h2>
     <ul>
-      <li>The page plays back captures that were made with the plugin. It does not run Unreal Engine, and nothing is rendered in the browser.</li>
+      <li>The simulator plays back captures that were made with the plugin. It does not run Unreal Engine, and nothing is rendered in the browser.</li>
       <li>All images come from one point, 000742, of the DTW level, captured in stereo at 1024 &times; 512 per eye. The viewer shows the left eye.</li>
       <li>Only daytime captures are included. The plugin also captures at night with the same four weathers.</li>
-      <li>Depth, Normal and Semantic do not depend on the weather: across the four captures of this point the semantic image is identical and fewer than 0.01&nbsp;% of the depth pixels differ by more than 1&nbsp;% (leaves moving between runs). The demo therefore shows one set for all four.</li>
-      <li>The real Color, Depth and Normal files are 16-bit floating-point EXR. Here Color is converted to sRGB, and Depth and Normal are colored for display; the read-outs under the cursor give the stored values (depth to the centimetre).</li>
+      <li>Depth, Normal and Semantic do not depend on the weather: across the four captures of this point the semantic image is identical and fewer than 0.01&nbsp;% of the depth pixels differ by more than 1&nbsp;% (leaves moving between runs). The simulator therefore shows one set for all four.</li>
+      <li>The real Color, Depth and Normal files are 16-bit floating-point EXR. Here Color is converted to sRGB, and Depth and Normal are colored for display; the read-outs under the cursor give the stored values (depth to the centimeter).</li>
       <li>Fields that only make sense in the editor, such as Resolution or Spline Spacing, are shown but fixed.</li>
     </ul>
   </section>
@@ -243,8 +243,8 @@
 
 <footer class="page-foot"><div class="wrap">Urban360 Capture Simulator &middot; data: DTW point 000742, plugin 2.0.0</div></footer>
 
-<script src="assets/simulator/pano-data.js?v=20261026"></script>
-<script src="assets/simulator/pano-viewer.js?v=20261026"></script>
-<script src="assets/simulator/simulator.js?v=20261026"></script>
+<script src="assets/simulator/pano-data.js?v=20261026b"></script>
+<script src="assets/simulator/pano-viewer.js?v=20261026b"></script>
+<script src="assets/simulator/simulator.js?v=20261026b"></script>
 </body>
 </html>
