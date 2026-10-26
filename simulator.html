@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Urban360 Capture Simulator</title>
+  <meta name="description" content="Try the Urban360 capture workflow in the browser: set the weather, check the level, press Play and inspect the four outputs of a real capture point.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://hanaru.github.io/urban360/simulator.html">
+  <meta property="og:title" content="Urban360 Capture Simulator">
+  <meta property="og:description" content="Walk through one Urban360 capture in the browser and inspect its Color, Depth, Normal and Semantic outputs.">
+  <meta property="og:image" content="https://hanaru.github.io/urban360/assets/Thumbnail.jpg">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans:400,700" rel="stylesheet">
+  <link rel="stylesheet" href="assets/simulator/simulator.css?v=20261026">
+</head>
+<body>
+
+<header class="page-head">
+  <div class="wrap">
+    <nav class="page-nav" aria-label="Site">
+      <a href="index.html">&larr; Project page</a>
+      <a href="documentation.html">Documentation</a>
+    </nav>
+    <p class="eyebrow">Urban360 Sim2Real Data Generation Plugin &middot; v2.0.0</p>
+    <h1>Capture Simulator</h1>
+    <p class="lede">
+      Walk through one capture the way it is done in the Unreal Editor: choose the weather, check the level,
+      press Play, and look at what comes out. Every image here is a real capture of one point in the
+      Downtown West (DTW) level.
+    </p>
+  </div>
+</header>
+
+<main>
+  <section class="wrap sim" id="simulator" aria-label="Capture simulator">
+
+    <ol class="stepper" id="stepper">
+      <li data-step="open"><button type="button"><span class="num">1</span><span class="lbl">Open</span><span class="sub">Urban360 button</span></button></li>
+      <li data-step="env"><button type="button"><span class="num">2</span><span class="lbl">Env</span><span class="sub">output, weather</span></button></li>
+      <li data-step="points"><button type="button"><span class="num">3</span><span class="lbl">Points</span><span class="sub">capture points</span></button></li>
+      <li data-step="capture"><button type="button"><span class="num">4</span><span class="lbl">Capture</span><span class="sub">channels, count</span></button></li>
+      <li data-step="verify"><button type="button"><span class="num">5</span><span class="lbl">Verify</span><span class="sub">Apply, Setup &amp; Verify</span></button></li>
+      <li data-step="play"><button type="button"><span class="num">6</span><span class="lbl">Play</span><span class="sub">capture and save</span></button></li>
+    </ol>
+    <p class="step-hint" id="stepHint" aria-live="polite"></p>
+
+    <div class="app" id="app">
+      <div class="app-toolbar">
+        <button type="button" class="tb-btn tb-u360 is-on" title="Urban360: opens the Capture Tool" aria-label="Urban360">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 19c-2 0-3-1.2-3-2.6 0-3 7-2.4 7-6 0-1.4-1.3-2.4-3-2.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.5" cy="7" r="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        </button>
+        <span class="tb-sep"></span>
+        <button type="button" class="tb-btn tb-play" id="btnPlay" title="Play: capture the ticked points" aria-label="Play">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+        </button>
+        <button type="button" class="tb-btn tb-stop" id="btnStop" title="Stop" aria-label="Stop" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" fill="currentColor"/></svg>
+        </button>
+        <span class="tb-title">DownTownWest_Train &middot; Demo_Environment</span>
+        <button type="button" class="tb-reset" id="btnReset" title="Start the demo again">Reset demo</button>
+      </div>
+
+      <div class="app-body">
+        <div class="viewport">
+          <div class="vp-bar">
+            <div class="seg" role="tablist" aria-label="Viewport">
+              <button type="button" class="seg-btn is-on" data-vp="scene" role="tab">Scene</button>
+              <button type="button" class="seg-btn" data-vp="output" role="tab" disabled title="Available after a capture">Output</button>
+            </div>
+            <div class="seg" id="chanBar" role="group" aria-label="Channel" hidden>
+              <button type="button" class="seg-btn" data-chan="color">Color</button>
+              <button type="button" class="seg-btn" data-chan="depth">Depth</button>
+              <button type="button" class="seg-btn" data-chan="normal">Normal</button>
+              <button type="button" class="seg-btn" data-chan="semantic">Semantic</button>
+            </div>
+            <div class="seg seg-right" role="group" aria-label="View">
+              <button type="button" class="seg-btn is-on" data-view="sphere" title="Look around">360&deg;</button>
+              <button type="button" class="seg-btn" data-view="flat" title="The whole panorama">Panorama</button>
+              <button type="button" class="seg-btn" data-view="file" title="The image file as written" hidden>File</button>
+            </div>
+          </div>
+          <div class="vp-stage" id="stage">
+            <canvas id="pano" aria-label="360 degree view of the capture point"></canvas>
+            <div class="file-view" id="fileView" hidden>
+              <div class="file-img">
+                <img id="fileImg" alt="Colour file of the capture: left eye on top, right eye below">
+                <span class="eye eye-l">Left eye</span><span class="eye eye-r">Right eye</span>
+              </div>
+              <p class="file-cap" id="fileCap"></p>
+            </div>
+            <div class="vp-badge" id="vpBadge"></div>
+            <div class="vp-hint" id="vpHint">Drag to look around &middot; scroll to zoom</div>
+            <div class="vp-legend" id="legend" hidden></div>
+            <div class="vp-readout" id="readout" aria-live="off"></div>
+            <div class="capture-overlay" id="capOverlay" hidden>
+              <div class="cap-box">
+                <p class="cap-title">Capturing point <b id="capNode"></b></p>
+                <ol class="cap-steps" id="capSteps"></ol>
+                <div class="cap-bar"><span id="capBar"></span></div>
+              </div>
+            </div>
+            <div class="loading" id="loading">Loading the capture&hellip;</div>
+          </div>
+        </div>
+
+        <aside class="tool" aria-label="Capture Tool">
+          <div class="tool-title">Dataset Generator</div>
+          <div class="tool-tabs" role="tablist">
+            <button type="button" class="tool-tab is-on" data-page="env" role="tab">Env</button>
+            <button type="button" class="tool-tab" data-page="points" role="tab">Points</button>
+            <button type="button" class="tool-tab" data-page="capture" role="tab">Capture</button>
+          </div>
+
+          <div class="tool-scroll">
+            <!-- Env -->
+            <div class="tool-page" data-page="env">
+              <div class="sec-head"><h3>Output Setup</h3><button type="button" class="help" data-help="env">?</button></div>
+              <div class="row"><label for="envName">Env Name</label><input id="envName" type="text" spellcheck="false" autocomplete="off"></div>
+              <div class="row"><label for="startIndex">Start Index</label><input id="startIndex" type="number" min="1" step="1"></div>
+              <div class="row"><label for="rootPath">Current Path</label><input id="rootPath" type="text" spellcheck="false" autocomplete="off"></div>
+              <div class="row"><label for="resolution">Resolution</label><input id="resolution" type="text" value="1024" readonly title="Fixed in this demo: the sample point was captured at 1024"></div>
+              <button type="button" class="btn wide" id="btnBrowse">Browse Path</button>
+
+              <div class="sec-head"><h3>Climate</h3></div>
+              <div class="row light"><label for="tod">Time of Day</label>
+                <select id="tod"><option value="day">Day</option><option value="night" disabled>Night (not in this demo)</option></select></div>
+              <div class="row light"><label for="weather">Weather</label>
+                <select id="weather"><option value="none">None</option><option value="rain">Rain</option><option value="snow">Snow</option><option value="fog">Fog</option></select></div>
+              <button type="button" class="btn wide" id="btnRefresh">Refresh</button>
+              <button type="button" class="btn wide" id="btnLevelSky">Level Sky &amp; Lights</button>
+              <div class="env-state"><b id="envStateName">Day / None</b><span id="envStateTag">nominal</span></div>
+              <button type="button" class="btn wide subtle" id="btnDetails" aria-expanded="false">+ Details</button>
+              <div class="details" id="details" hidden></div>
+              <button type="button" class="btn wide big" id="btnCalib" aria-expanded="false">+ Calibration</button>
+              <p class="note" id="calibNote" hidden>Advanced values: fog density per weather, weather fog scale, sky light boost and the lighting standard. They normally stay at their defaults and are not simulated here.</p>
+            </div>
+
+            <!-- Points -->
+            <div class="tool-page" data-page="points" hidden>
+              <div class="sec-head"><h3>Point Generation</h3><button type="button" class="help" data-help="points">?</button></div>
+              <button type="button" class="btn wide" data-demo-only="spline">Place Road Spline</button>
+              <div class="row"><label>Spline Spacing</label><input type="text" value="500" readonly><span class="unit">cm</span></div>
+              <div class="row"><label>Safety Radius</label><input type="text" value="35" readonly></div>
+              <div class="row"><label>Road Width</label><input type="text" value="0" readonly class="dim"></div>
+              <div class="btn-pair"><button type="button" class="btn" data-demo-only="estimate">Check Estimate</button><span class="ready">Ready</span></div>
+              <button type="button" class="btn wide" data-demo-only="clear">Clear All</button>
+              <button type="button" class="btn wide" data-demo-only="generate">Generate Points</button>
+              <div class="btn-pair"><button type="button" class="btn" id="btnTargetAll">Target All</button><button type="button" class="btn" id="btnSkipAll">Skip All</button></div>
+              <button type="button" class="btn wide" data-demo-only="anchors">Export Anchors</button>
+              <p class="next-play" id="nextPlay"></p>
+              <button type="button" class="btn wide" id="btnPointList">Open Point List</button>
+              <div class="point-list" id="pointList" hidden>
+                <label class="pl-row"><input type="checkbox" id="plTarget"><span class="pl-id">000742</span><span class="pl-note">Capture Target</span></label>
+              </div>
+              <figure class="tool-fig">
+                <img src="assets/simulator/editor/points_viewport.jpg" alt="Capture points laid along a street of the DTW level in the editor viewport" loading="lazy">
+                <figcaption>In the editor, points are laid along the road (803 in this level). The demo captures one of them, 000742.</figcaption>
+              </figure>
+            </div>
+
+            <!-- Capture -->
+            <div class="tool-page" data-page="capture" hidden>
+              <div class="sec-head"><h3>Capture Config</h3><button type="button" class="help" data-help="capture">?</button></div>
+              <div class="row"><label for="stereo">Capture Stereo</label>
+                <select id="stereo"><option>Stereo</option><option>Mono</option></select></div>
+              <div class="row"><label for="ctTarget">Capture Target</label><span class="inline-check"><input type="checkbox" id="ctTarget"><span>000742</span></span></div>
+              <p class="mode-head">Capture Mode</p>
+              <div class="modes" role="group" aria-label="Capture Mode">
+                <label><span>RGB</span><input type="checkbox" data-mode="color"></label>
+                <label><span>Depth</span><input type="checkbox" data-mode="depth"></label>
+                <label><span>Normal</span><input type="checkbox" data-mode="normal"></label>
+                <label><span>Semantic</span><input type="checkbox" data-mode="semantic"></label>
+                <label><span>All</span><input type="checkbox" id="modeAll"></label>
+              </div>
+              <div class="row"><label for="count">Capture Count</label>
+                <select id="count"><option value="single">Single (1)</option><option value="group">Group (9)</option></select></div>
+              <div class="row"><label>Camera Height</label><input type="text" value="160" readonly><span class="unit">cm</span></div>
+              <div class="row"><label>Local Step</label><input type="text" value="10" readonly id="localStep" class="dim"><span class="unit">cm</span></div>
+              <button type="button" class="btn wide" id="btnSemantic">Semantic Option</button>
+              <button type="button" class="btn wide" id="btnExr">Open EXR Viewer</button>
+            </div>
+          </div>
+
+          <div class="tool-foot">
+            <p class="status" id="statusLine"></p>
+            <button type="button" class="btn wide apply" id="btnApply">Apply Settings</button>
+            <button type="button" class="btn wide verify" id="btnVerify">Setup &amp; Verify</button>
+          </div>
+        </aside>
+      </div>
+
+      <div class="dialog" id="dialog" hidden role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+        <div class="dlg-box">
+          <div class="dlg-head"><h3 id="dlgTitle"></h3><button type="button" class="dlg-x" id="dlgClose" aria-label="Close">&times;</button></div>
+          <div class="dlg-body" id="dlgBody"></div>
+        </div>
+      </div>
+      <div class="toasts" id="toasts" aria-live="polite"></div>
+    </div>
+
+    <div class="outputs" id="outputs" hidden>
+      <div class="out-col">
+        <h2>Output folder</h2>
+        <ul class="tree" id="tree"></ul>
+        <p class="note" id="treeNote"></p>
+      </div>
+      <div class="out-col">
+        <h2>Manifest</h2>
+        <p class="note">One row per capture position. Position is in metres and rotation is a unit quaternion, both in the
+          computer-vision camera convention.</p>
+        <table class="mf" id="manifest"></table>
+        <details class="raw"><summary>Raw CSV</summary><pre id="manifestRaw"></pre></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap block">
+    <h2>In the Unreal Editor</h2>
+    <p>The simulator mirrors the real tool. These are screenshots of it in the DTW level.</p>
+    <figure class="shot">
+      <img src="assets/simulator/editor/editor_overview.jpg" alt="The DTW level in the Unreal Editor with the Urban360 toolbar button and the Capture Tool panel marked" loading="lazy">
+      <figcaption>The Urban360 toolbar button (1) opens the Capture Tool (2) as a panel next to the viewport.</figcaption>
+    </figure>
+    <div class="shot-row">
+      <figure class="shot"><img src="assets/simulator/editor/page_env.png" alt="Env page of the Capture Tool" loading="lazy"><figcaption>Env: output and climate</figcaption></figure>
+      <figure class="shot"><img src="assets/simulator/editor/page_points.png" alt="Points page of the Capture Tool" loading="lazy"><figcaption>Points: generation and management</figcaption></figure>
+      <figure class="shot"><img src="assets/simulator/editor/page_capture.png" alt="Capture page of the Capture Tool" loading="lazy"><figcaption>Capture: what each point records</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="wrap block notes">
+    <h2>About this demo</h2>
+    <ul>
+      <li>The page plays back captures that were made with the plugin. It does not run Unreal Engine, and nothing is rendered in the browser.</li>
+      <li>All images come from one point, 000742, of the DTW level, captured in stereo at 1024 &times; 512 per eye. The viewer shows the left eye.</li>
+      <li>Only daytime captures are included. The plugin also captures at night with the same four weathers.</li>
+      <li>Depth, Normal and Semantic do not depend on the weather: across the four captures of this point the semantic image is identical and fewer than 0.01&nbsp;% of the depth pixels differ by more than 1&nbsp;% (leaves moving between runs). The demo therefore shows one set for all four.</li>
+      <li>The real Color, Depth and Normal files are 16-bit floating-point EXR. Here Color is converted to sRGB, and Depth and Normal are colored for display; the read-outs under the cursor give the stored values (depth to the centimetre).</li>
+      <li>Fields that only make sense in the editor, such as Resolution or Spline Spacing, are shown but fixed.</li>
+    </ul>
+  </section>
+</main>
+
+<footer class="page-foot"><div class="wrap">Urban360 Capture Simulator &middot; data: DTW point 000742, plugin 2.0.0</div></footer>
+
+<script src="assets/simulator/pano-data.js?v=20261026"></script>
+<script src="assets/simulator/pano-viewer.js?v=20261026"></script>
+<script src="assets/simulator/simulator.js?v=20261026"></script>
+</body>
+</html>
